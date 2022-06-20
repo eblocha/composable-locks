@@ -5,7 +5,7 @@ import { RWMutex, LockTypes } from "./readwrite";
 const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
   const release = await lock.acquire(LockTypes.READ);
   try {
-    cb();
+    await cb();
   } finally {
     release();
   }
@@ -14,7 +14,7 @@ const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
 const withWrite = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
   const release = await lock.acquire(LockTypes.WRITE);
   try {
-    cb();
+    await cb();
   } finally {
     release();
   }
