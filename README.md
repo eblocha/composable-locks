@@ -123,14 +123,16 @@ import {
   LockTypes,
 } from "js-locks";
 
-const lock = new KeyedMutex(
-  () => new RWMutex(() => new ReentrantMutex(() => new Mutex()))
+const lock = new ReentrantMutex(
+  () => new KeyedMutex(() => new RWMutex(() => new Mutex()))
 );
 
 await lock.domain(async (domain) => {
-  await lock.acquire(key, LockTypes.READ, domain);
+  await lock.acquire(domain, key, LockTypes.READ);
 });
 ```
+
+**NOTE: to use the re-entrant mutex in compositions, put it at the top level, since it is the only mutex that implements the `domain` method.**
 
 ## Helper Functions
 
