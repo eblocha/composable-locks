@@ -13,18 +13,16 @@ export enum LockTypes {
  * Single threaded write-preferring read write lock
  * See: https://gist.github.com/CMCDragonkai/4de5c1526fc58dac259e321db8cf5331
  */
-export class RWMutex<A extends any[] = [], L extends ILock<A> = Mutex>
-  implements ILock<[LockTypes, ...A]>
-{
-  protected readersLock: L;
-  protected writersLock: L;
+export class RWMutex<A extends unknown[]> implements ILock<[LockTypes, ...A]> {
+  protected readersLock: ILock<A>;
+  protected writersLock: ILock<A>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   protected readersRelease: Releaser = () => {};
   protected readerCountBlocked = 0;
   protected _readerCount = 0;
   protected _writerCount = 0;
 
-  constructor(newLock: () => L) {
+  constructor(newLock: () => ILock<A>) {
     this.readersLock = newLock();
     this.writersLock = newLock();
   }

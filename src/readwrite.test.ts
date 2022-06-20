@@ -2,7 +2,7 @@ import { Mutex } from "async-mutex";
 import { describe, it, expect } from "vitest";
 import { RWMutex, LockTypes } from "./readwrite";
 
-const withRead = async (lock: RWMutex, cb: () => Promise<void>) => {
+const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
   const release = await lock.acquire(LockTypes.READ);
   try {
     cb();
@@ -11,7 +11,7 @@ const withRead = async (lock: RWMutex, cb: () => Promise<void>) => {
   }
 };
 
-const withWrite = async (lock: RWMutex, cb: () => Promise<void>) => {
+const withWrite = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
   const release = await lock.acquire(LockTypes.WRITE);
   try {
     cb();

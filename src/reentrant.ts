@@ -26,7 +26,7 @@ class Domain implements IDomain {}
  * })
  * ```
  */
-export class ReentrantMutex<A extends any[] = [], L extends ILock<A> = Mutex>
+export class ReentrantMutex<A extends unknown[]>
   implements ILock<[IDomain, ...A]>
 {
   /** The current domain that does not have to wait to acquire */
@@ -34,10 +34,10 @@ export class ReentrantMutex<A extends any[] = [], L extends ILock<A> = Mutex>
   /** The number of times the current domain has acquired the lock */
   protected reentrants: number = 0;
   /** The lock */
-  protected lock: L;
+  protected lock: ILock<A>;
   protected releaser: Releaser = () => {};
 
-  constructor(newLock: () => L) {
+  constructor(newLock: () => ILock<A>) {
     this.lock = newLock();
   }
 

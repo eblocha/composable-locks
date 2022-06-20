@@ -1,4 +1,4 @@
-# Re-entrant, Keyed, and Read-Write Locks for Javascript
+# Composable Re-entrant, Keyed, and Read-Write Locks for Javascript
 
 This library provides a number of different concurrency locks:
 
@@ -34,7 +34,7 @@ You _can't_ use this module to lock resources _across_ node processes.
 Starting with a basic mutex, re-exported from [async-mutex](https://github.com/DirtyHairy/async-mutex)
 
 ```ts
-import { Mutex } from "js-locks";
+import { Mutex } from "composable-locks";
 
 const mutex = new Mutex();
 
@@ -50,7 +50,7 @@ const mutex = new Mutex();
 Using a read-write mutex, you can allow multiple readers to acquire the lock, where writers need exclusive access:
 
 ```ts
-import { RWMutex, LockTypes } from "js-locks";
+import { RWMutex, LockTypes } from "composable-locks";
 
 const mutex = new RWMutex(() => new Mutex());
 
@@ -83,7 +83,7 @@ read();
 A re-entrant mutex can re-acquire the lock. For example, to allow a recursive function to traverse a graph and visit the same node multiple times.
 
 ```ts
-import { ReentrantMutex, Mutex, IDomain } from "js-locks";
+import { ReentrantMutex, Mutex, IDomain } from "composable-locks";
 
 const lock = new ReentrantMutex(() => new Mutex());
 
@@ -100,7 +100,7 @@ lock.domain(async (domain) => {
 The keyed mutex provides a way to map keys to different locks.
 
 ```ts
-import { KeyedMutex, Mutex } from "js-locks";
+import { KeyedMutex, Mutex } from "composable-locks";
 
 const locks = new KeyedMutex(() => new Mutex());
 
@@ -121,7 +121,7 @@ import {
   RWMutex,
   Mutex,
   LockTypes,
-} from "js-locks";
+} from "composable-locks";
 
 const lock = new ReentrantMutex(
   () => new KeyedMutex(() => new RWMutex(() => new Mutex()))
@@ -141,7 +141,7 @@ await lock.domain(async (domain) => {
 `withPermissions` can release multiple locks after a function returns.
 
 ```ts
-import { withPermissions, Mutex, KeyedMutex } from "js-locks";
+import { withPermissions, Mutex, KeyedMutex } from "composable-locks";
 
 const lock = new KeyedMutex(() => new Mutex());
 

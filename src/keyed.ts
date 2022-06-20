@@ -1,5 +1,5 @@
 import type { Mutex } from "async-mutex";
-import { ILock } from "./interfaces";
+import { ILock, Releaser } from "./interfaces";
 
 export type Resolver<K extends string | number | symbol = string> = (
   key: K
@@ -14,17 +14,16 @@ type LockRecord<T> = {
  * A keyed lock, for mapping strings to a lock type
  */
 export class KeyedMutex<
-  TKey extends string | number | symbol = string,
-  TArgs extends any[] = [],
-  TLock extends ILock<TArgs> = Mutex
+  TArgs extends unknown[],
+  TKey extends string | number | symbol = string
 > implements ILock<[TKey, ...TArgs]>
 {
-  protected locks: Record<TKey, LockRecord<TLock>> = {} as Record<
+  protected locks: Record<TKey, LockRecord<ILock<TArgs>>> = {} as Record<
     TKey,
-    LockRecord<TLock>
+    LockRecord<ILock<TArgs>>
   >;
   resolver: Resolver<TKey>;
-  newLock: () => TLock;
+  newLock: () => ILock<TArgs>;
 
   /**
    * A keyed lock, for mapping strings to a lock type
@@ -32,16 +31,16 @@ export class KeyedMutex<
    * @param resolver A function to transform a key into a normaized form.
    * Useful for resolving paths.
    */
-  constructor(newLock: () => TLock, resolver?: Resolver<TKey>) {
+  constructor(newLock: () => ILock<TArgs>, resolver?: Resolver<TKey>) {
     this.resolver = resolver ?? ((key) => key);
     this.newLock = newLock;
   }
 
-  private getOrCreateLock(key: TKey): LockRecord<TLock> {
+  private getOrCreateLock(key: TKey): LockRecord<ILock<TArgs>> {
     let record = this.locks[key];
     if (record) return record;
 
-    const newRecord: LockRecord<TLock> = {
+    const newRecord: LockRecord<ILock<TArgs>> = {
       count: 0,
       lock: this.newLock(),
     };
@@ -62,7 +61,7 @@ export class KeyedMutex<
     }
   }
 
-  public async acquire(key: TKey, ...args: TArgs) {
+  public async acquire(key: TKey, ...args: TArgs): Promise<Releaser> {
     const resolved = this.resolver(key);
     const record = this.getOrCreateLock(resolved);
 
