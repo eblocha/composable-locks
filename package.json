@@ -6,7 +6,7 @@
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "author": "Elliott Blocha",
+  "author": "eblocha",
   "license": "GPL-2.0",
   "scripts": {
     "clean": "rm -rf dist",
