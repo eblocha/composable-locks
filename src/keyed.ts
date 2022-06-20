@@ -1,4 +1,3 @@
-import type { Mutex } from "async-mutex";
 import { ILock, Releaser } from "./interfaces";
 
 export type Resolver<K extends string | number | symbol = string> = (

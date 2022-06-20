@@ -1,4 +1,3 @@
-import { Mutex } from "async-mutex";
 import { ILock, Releaser } from "./interfaces";
 import { asyncNOP } from "./utils";
 
@@ -47,12 +46,15 @@ export class ReentrantMutex<A extends unknown[]>
    * @returns A function to release the lock. A domain *must* call all releasers before exiting.
    */
   public async acquire(id: IDomain, ...args: A) {
-    if (id === this.holder) {
+    if (this.holder === null) {
+      // if holder is null, we acquire right away.
+      this.holder = id;
+      this.releaser = await this.lock.acquire(...args);
+    } else if (id === this.holder) {
       // wait one tick to take the same number of ticks as actually acquiring
       await asyncNOP();
     } else {
-      // if holder is null, we acquire right away.
-      // Otherwise, we wait until the current domain releases.
+      // wait until the current domain releases.
       this.releaser = await this.lock.acquire(...args);
       // once acquired, set ourselves to the current holder
       this.holder = id;
