@@ -1,7 +1,7 @@
 import { Mutex } from "async-mutex";
 import { describe, it, expect } from "vitest";
 import { IDomain, ReentrantMutex } from "./reentrant";
-import { asyncNOP, withPermissions } from "./utils";
+import { asyncNOP } from "./utils";
 
 describe("Reentrant Mutex", () => {
   it("Only allows one domain to acquire", async () => {
