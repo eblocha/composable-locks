@@ -88,8 +88,8 @@ import { ReentrantMutex, Mutex, IDomain } from "composable-locks";
 const lock = new ReentrantMutex(() => new Mutex());
 
 lock.domain(async (domain) => {
-  const release1 = lock.acquire(domain);
-  const release2 = lock.acquire(domain);
+  const release1 = await lock.acquire(domain);
+  const release2 = await lock.acquire(domain);
   release1();
   release2();
 });
