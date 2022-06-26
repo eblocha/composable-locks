@@ -13,5 +13,5 @@
   "parserOptions": {
     "project": ["./tsconfig.json", "./tsconfig.eslint.json"]
   },
-  "ignorePatterns": ["vite.config.ts"]
+  "ignorePatterns": ["vite.config.ts", "dist", "node_modules", "coverage"]
 }
