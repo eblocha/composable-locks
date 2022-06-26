@@ -66,6 +66,7 @@ describe("Base RW Lock", () => {
 
     const expected = locks.map((type, index) => type + index.toString());
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     const fn = async (index: number) => {
       const e = expected[index];
       if (e) data.push(e);
@@ -129,6 +130,7 @@ describe("Base RW Lock", () => {
         await asyncNOP();
         data.push("data2");
       }),
+      // eslint-disable-next-line @typescript-eslint/require-await
       withRead(lock, async () => {
         data.push("data1");
       }),
@@ -146,6 +148,7 @@ describe("Base RW Lock", () => {
         await asyncNOP();
         data.push("data1");
       }),
+      // eslint-disable-next-line @typescript-eslint/require-await
       withWrite(lock, async () => {
         data.push("data2");
       }),

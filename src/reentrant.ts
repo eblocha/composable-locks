@@ -2,6 +2,7 @@ import { ILock, Releaser } from "./interfaces";
 import { asyncNOP } from "./utils";
 
 // exported for use in function signatures
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IDomain {}
 
 // do not export
@@ -31,9 +32,10 @@ export class ReentrantMutex<A extends unknown[]>
   /** The current domain that does not have to wait to acquire */
   protected holder: IDomain | null = null;
   /** The number of times the current domain has acquired the lock */
-  protected reentrants: number = 0;
+  protected reentrants = 0;
   /** The lock */
   protected lock: ILock<A>;
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   protected releaser: Releaser = () => {};
 
   constructor(newLock: () => ILock<A>) {

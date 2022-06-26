@@ -54,6 +54,7 @@ export class RWMutex<A extends unknown[]> implements ILock<[LockTypes, ...A]> {
     switch (type) {
       case LockTypes.READ:
         await this.readersLock.waitForUnlock(...args);
+        break;
       case LockTypes.WRITE:
         // writers need both readers and writers unlocked
         await Promise.all([

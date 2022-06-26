@@ -36,7 +36,7 @@ export class KeyedMutex<
   }
 
   private getOrCreateLock(key: TKey): LockRecord<ILock<TArgs>> {
-    let record = this.locks[key];
+    const record = this.locks[key];
     if (record) return record;
 
     const newRecord: LockRecord<ILock<TArgs>> = {
