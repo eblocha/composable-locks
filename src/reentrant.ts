@@ -85,7 +85,7 @@ export class ReentrantMutex<A extends unknown[]>
 
   /**
    * Run a callback inside a locking domain.
-   * The mutex can be re-acuired with the domain identifier passed to the provded callback.
+   * The mutex can be re-acquired with the domain identifier passed to the provided callback.
    * @param cb The function to run inside the domain
    * @returns The return value of the function
    */

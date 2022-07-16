@@ -27,7 +27,7 @@ export class KeyedMutex<
   /**
    * A keyed lock, for mapping strings to a lock type
    * @param newLock A function to create a new lock interface
-   * @param resolver A function to transform a key into a normaized form.
+   * @param resolver A function to transform a key into a normalized form.
    * Useful for resolving paths.
    */
   constructor(newLock: () => ILock<TArgs>, resolver?: Resolver<TKey>) {
