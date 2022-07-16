@@ -1,4 +1,4 @@
-import { MutexInterface } from "async-mutex";
+import { Releaser } from "./interfaces";
 
 /** Forces a function to pause and move itself to the back of the event loop */
 export const asyncNOP = async () => new Promise<void>((resolve) => resolve());
@@ -10,7 +10,7 @@ export const asyncNOP = async () => new Promise<void>((resolve) => resolve());
  * @returns The return value of f
  */
 export const withPermissions = async <T>(
-  permssions: Promise<MutexInterface.Releaser>[],
+  permssions: Promise<Releaser>[],
   f: () => T | Promise<T>
 ): Promise<T> => {
   const releasers = await Promise.all(permssions);
