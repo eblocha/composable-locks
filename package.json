@@ -17,6 +17,11 @@
   "types": "./dist/index.d.ts",
   "author": "eblocha",
   "license": "GPL-2.0",
+  "homepage": "https://github.com/eblocha/composable-locks#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eblocha/composable-locks"
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "build": "yarn clean && tsc",
