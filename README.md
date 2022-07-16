@@ -8,6 +8,18 @@ This library provides a number of different concurrency locks:
 
 These locks can be inter-mingled to combine their functionality.
 
+## Install
+
+```
+yarn add composable-locks
+```
+
+or
+
+```
+npm install composable-locks
+```
+
 ## When you do, and _don't_ need this module
 
 You may need this module if you need to read data from an external source (like a file or database), modify it, then write it back. If you don't lock the resource, you might get the following scenario:
