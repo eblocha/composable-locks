@@ -69,4 +69,15 @@ describe("Keyed lock", () => {
     await Promise.all(delayTicks.map((ticks, index) => fn(ticks, keys[index])));
     expect(data).toStrictEqual(expected);
   });
+
+  it("release is idempotent", async () => {
+    const lock = new KeyedMutex(() => new Mutex());
+
+    const release = await lock.acquire("a");
+    release();
+    release();
+
+    const r = await lock.acquire("a");
+    r();
+  });
 });

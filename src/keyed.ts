@@ -70,9 +70,10 @@ export class KeyedMutex<
 
     return () => {
       release();
-      record.count--;
       if (record.count === 0) {
         delete this.locks[resolved];
+      } else {
+        record.count--;
       }
     };
   }
