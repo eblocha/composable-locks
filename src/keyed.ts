@@ -68,13 +68,19 @@ export class KeyedMutex<
 
     const release = await record.lock.acquire(...args);
 
+    // ensure idempotence
+    let released = false;
+
     return () => {
       release();
+
+      if (released) return;
+      record.count--;
       if (record.count === 0) {
         delete this.locks[resolved];
-      } else {
-        record.count--;
       }
+
+      released = true;
     };
   }
 
