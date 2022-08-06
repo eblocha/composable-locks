@@ -64,7 +64,12 @@ export class ReentrantMutex<A extends unknown[]>
 
     // if we are here, we are the current domain. Increment re-entrants.
     this.reentrants++;
+
+    // ensure idempotence
+    let released = false;
+
     return () => {
+      if (released) return;
       // When releasing, decrement the re-entrants.
       this.reentrants--;
       if (this.reentrants === 0) {
@@ -72,6 +77,7 @@ export class ReentrantMutex<A extends unknown[]>
         this.holder = null;
         this.releaser();
       }
+      released = true;
     };
   }
 

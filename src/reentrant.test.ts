@@ -67,4 +67,38 @@ describe("Reentrant Mutex", () => {
       "finish 20",
     ]);
   });
+
+  it("release function is idempotent", async () => {
+    const lock = new ReentrantMutex(() => new Mutex());
+
+    const data: string[] = [];
+
+    // create 2 domains, and re-acquire lock in the first. Call the release function for the first aqcuisition twice.
+    await lock.domain(async (id) => {
+      const release1 = await lock.acquire(id);
+      const release2 = await lock.acquire(id);
+      data.push("d1-1");
+
+      release1();
+      release1();
+
+      // this second domain should be deferred until the release2 function is called
+      const p = lock.domain(async (id) => {
+        const r = await lock.acquire(id);
+        data.push("d2-1");
+        r();
+      });
+
+      await Promise.all([
+        (async () => {
+          await asyncNOP();
+          data.push("d1-2");
+          release2();
+        })(),
+        p,
+      ]);
+    });
+
+    expect(data).toStrictEqual(["d1-1", "d1-2", "d2-1"]);
+  });
 });
