@@ -156,4 +156,37 @@ describe("Base RW Lock", () => {
 
     expect(data).toStrictEqual(["data1", "data2"]);
   });
+
+  it("release is idempotent", async () => {
+    const lock = newMutex();
+
+    const data: string[] = [];
+
+    const write = async () => {
+      const r = await lock.acquire(LockTypes.WRITE);
+      data.push("write");
+      r();
+    };
+
+    // acquire 2 readers, but release 1 of them twice. Before releasing the second reader, try to acquire a writer.
+    // The writer should finish last
+    const release1 = await lock.acquire(LockTypes.READ);
+    const release2Promise = lock.acquire(LockTypes.READ);
+    data.push("read1");
+
+    // try to trick the lock into thinking we released the second writer
+    release1();
+    release1();
+
+    const p = write();
+
+    const release2 = await release2Promise;
+
+    data.push("read2");
+    release2();
+
+    await p;
+
+    expect(data).toStrictEqual(["read1", "read2", "write"]);
+  });
 });

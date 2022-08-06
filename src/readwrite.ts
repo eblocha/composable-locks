@@ -83,12 +83,18 @@ export class RWMutex<A extends unknown[]> implements ILock<[LockTypes, ...A]> {
       // whether we need to acquire the lock or not
       await asyncNOP();
     }
+
+    // need a closure here for idempotence
+    let released = false;
+
     return () => {
+      if (released) return;
       const readerCount = --this._readerCount;
       // The last reader unlocks
       if (readerCount === 0) {
         this.readersRelease();
       }
+      released = true;
     };
   }
 
