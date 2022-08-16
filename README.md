@@ -122,6 +122,24 @@ const releaseFile2 = await locks.acquire("file2");
 // etc. You get the idea...
 ```
 
+### Key Resolver
+
+When locking files, you may want to resolve the path to the file, to prevent relative paths from double-locking a file. You can pass a resolver function to the mutex:
+
+```ts
+import { KeyedMutex, Mutex } from "composable-locks";
+import * as path from "path";
+
+const lock = new KeyedMutex(
+  () => new Mutex(),
+  (key) => path.resolve(key)
+);
+
+// this will now deadlock
+const releaseFile1 = await lock.acquire("./somedir/file");
+const releaseFile2 = await lock.acquire("./somedir/../somedir/file");
+```
+
 ## Composing Mutexes
 
 You can compose these different mutex types together to combine functionality. Want a keyed, read-write, reentrant mutex? Just combine the components!
