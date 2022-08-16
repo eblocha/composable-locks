@@ -10,16 +10,12 @@ export class Domain {}
  * Usage:
  * ```
  * const lock = new ReentrantMutex()
+ * const domain = new Domain()
  *
- * lock.domain(async (id) => {
- *   const release = await lock.acquire(id)
- *   try {
- *     const release = await lock.acquire(id)
- *     release()
- *   } finally {
- *     release()
- *   }
- * })
+ * const release1 = await lock.acquire(domain)
+ * const release2 = await lock.acquire(domain)
+ * release1()
+ * release2()
  * ```
  */
 export class ReentrantMutex<A extends unknown[]>
