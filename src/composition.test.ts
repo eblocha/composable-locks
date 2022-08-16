@@ -2,7 +2,7 @@ import { Mutex } from "async-mutex";
 import { describe, it, expect } from "vitest";
 import { KeyedMutex } from "./keyed";
 import { LockTypes, RWMutex } from "./readwrite";
-import { IDomain, ReentrantMutex } from "./reentrant";
+import { Domain, ReentrantMutex } from "./reentrant";
 import { asyncNOP, withPermissions } from "./utils";
 
 describe("Lock composition", () => {
@@ -16,7 +16,7 @@ describe("Lock composition", () => {
     const delayTicks: number[] = [5, 2];
 
     const fn = async (
-      id: IDomain,
+      id: Domain,
       key: string,
       type: LockTypes,
       ticks: number
@@ -29,11 +29,11 @@ describe("Lock composition", () => {
       });
     };
 
-    await lock.domain(async (id) => {
-      await Promise.all(
-        delayTicks.map((ticks) => fn(id, "file", LockTypes.WRITE, ticks))
-      );
-    });
+    const id = new Domain();
+
+    await Promise.all(
+      delayTicks.map((ticks) => fn(id, "file", LockTypes.WRITE, ticks))
+    );
 
     expect(data).toStrictEqual([2, 5]);
   });

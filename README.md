@@ -95,16 +95,16 @@ read();
 A re-entrant mutex can re-acquire the lock. For example, to allow a recursive function to traverse a graph and visit the same node multiple times.
 
 ```ts
-import { ReentrantMutex, Mutex, IDomain } from "composable-locks";
+import { ReentrantMutex, Mutex, Domain } from "composable-locks";
 
 const lock = new ReentrantMutex(() => new Mutex());
 
-lock.domain(async (domain) => {
-  const release1 = await lock.acquire(domain);
-  const release2 = await lock.acquire(domain);
-  release1();
-  release2();
-});
+const domain = new Domain();
+
+const release1 = await lock.acquire(domain);
+const release2 = await lock.acquire(domain);
+release1();
+release2();
 ```
 
 ## Keyed Mutex
@@ -133,18 +133,17 @@ import {
   RWMutex,
   Mutex,
   LockTypes,
+  Domain,
 } from "composable-locks";
 
 const lock = new ReentrantMutex(
   () => new KeyedMutex(() => new RWMutex(() => new Mutex()))
 );
 
-await lock.domain(async (domain) => {
-  await lock.acquire(domain, key, LockTypes.READ);
-});
-```
+const domain = new Domain();
 
-**NOTE: to use the re-entrant mutex in compositions, put it at the top level, since it is the only mutex that implements the `domain` method.**
+await lock.acquire(domain, key, LockTypes.READ);
+```
 
 ## Helper Functions
 

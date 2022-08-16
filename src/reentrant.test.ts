@@ -1,6 +1,6 @@
 import { Mutex } from "async-mutex";
 import { describe, it, expect } from "vitest";
-import { IDomain, ReentrantMutex } from "./reentrant";
+import { Domain, ReentrantMutex } from "./reentrant";
 import { asyncNOP } from "./utils";
 
 describe("Reentrant Mutex", () => {
@@ -12,16 +12,15 @@ describe("Reentrant Mutex", () => {
     const delayTicks: number[] = [20, 2];
 
     const fn = async (ticks: number) => {
-      await lock.domain(async (id) => {
-        data.push(`try ${ticks}`);
-        const release = await lock.acquire(id);
-        data.push(`start ${ticks}`);
-        for (let i = 0; i < ticks; i++) {
-          await asyncNOP();
-        }
-        data.push(`finish ${ticks}`);
-        release();
-      });
+      const id = new Domain();
+      data.push(`try ${ticks}`);
+      const release = await lock.acquire(id);
+      data.push(`start ${ticks}`);
+      for (let i = 0; i < ticks; i++) {
+        await asyncNOP();
+      }
+      data.push(`finish ${ticks}`);
+      release();
     };
 
     await Promise.all(delayTicks.map(fn));
@@ -43,7 +42,7 @@ describe("Reentrant Mutex", () => {
 
     const delayTicks: number[] = [20, 2];
 
-    const fn = async (id: IDomain, ticks: number) => {
+    const fn = async (id: Domain, ticks: number) => {
       data.push(`try ${ticks}`);
       const release = await lock.acquire(id);
       data.push(`start ${ticks}`);
@@ -54,9 +53,9 @@ describe("Reentrant Mutex", () => {
       release();
     };
 
-    await lock.domain(async (id) => {
-      await Promise.all(delayTicks.map((ticks) => fn(id, ticks)));
-    });
+    const id = new Domain();
+
+    await Promise.all(delayTicks.map((ticks) => fn(id, ticks)));
 
     expect(data).toStrictEqual([
       "try 20",
@@ -73,31 +72,32 @@ describe("Reentrant Mutex", () => {
 
     const data: string[] = [];
 
+    const id1 = new Domain();
+    const id2 = new Domain();
+
     // create 2 domains, and re-acquire lock in the first. Call the release function for the first aqcuisition twice.
-    await lock.domain(async (id) => {
-      const release1 = await lock.acquire(id);
-      const release2 = await lock.acquire(id);
-      data.push("d1-1");
+    const release1 = await lock.acquire(id1);
+    const release2 = await lock.acquire(id1);
+    data.push("d1-1");
 
-      release1();
-      release1();
+    release1();
+    release1();
 
-      // this second domain should be deferred until the release2 function is called
-      const p = lock.domain(async (id) => {
-        const r = await lock.acquire(id);
-        data.push("d2-1");
-        r();
-      });
+    // this second domain should be deferred until the release2 function is called
+    const p = (async () => {
+      const r = await lock.acquire(id2);
+      data.push("d2-1");
+      r();
+    })();
 
-      await Promise.all([
-        (async () => {
-          await asyncNOP();
-          data.push("d1-2");
-          release2();
-        })(),
-        p,
-      ]);
-    });
+    await Promise.all([
+      (async () => {
+        await asyncNOP();
+        data.push("d1-2");
+        release2();
+      })(),
+      p,
+    ]);
 
     expect(data).toStrictEqual(["d1-1", "d1-2", "d2-1"]);
   });
