@@ -19,10 +19,10 @@ export class Domain {}
  * ```
  */
 export class ReentrantMutex<A extends unknown[]>
-  implements ILock<[Domain, ...A]>
+  implements ILock<[unknown, ...A]>
 {
   /** The current domain that does not have to wait to acquire */
-  protected holder: Domain | null = null;
+  protected holder: unknown | null = null;
   /** The number of times the current domain has acquired the lock */
   protected reentrants = 0;
   /** The lock */
@@ -36,10 +36,10 @@ export class ReentrantMutex<A extends unknown[]>
 
   /**
    * Acquire the lock
-   * @param id The domain identifier, provided by the `domain` method.
+   * @param id The domain identifier.
    * @returns A function to release the lock. A domain *must* call all releasers before exiting.
    */
-  public async acquire(id: Domain, ...args: A) {
+  public async acquire(id: unknown, ...args: A) {
     if (this.holder === null) {
       // if holder is null, we acquire right away.
       this.holder = id;
@@ -73,7 +73,7 @@ export class ReentrantMutex<A extends unknown[]>
     };
   }
 
-  public async waitForUnlock(id: Domain, ...args: A): Promise<void> {
+  public async waitForUnlock(id: unknown, ...args: A): Promise<void> {
     if (!this.holder || id === this.holder) {
       await asyncNOP();
     } else {
