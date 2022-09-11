@@ -42,26 +42,9 @@ export class ReentrantMutex<A extends unknown[]>
    * @returns A function to release the lock. A domain *must* call all releasers before exiting.
    */
   public async acquire(id: unknown, ...args: A) {
-    let queued: Queued;
-
-    if (this.greedy) {
-      const existing = this.lockMap.get(id);
-      if (existing) {
-        queued = existing;
-        await asyncNOP();
-      } else {
-        queued = this.createQueued(id, ...args);
-        this.lockMap.set(id, queued);
-      }
-    } else {
-      if (!this.latest || this.latest.id !== id) {
-        queued = this.createQueued(id, ...args);
-        this.latest = queued;
-      } else {
-        queued = this.latest;
-        queued.reentrants++;
-        await asyncNOP();
-      }
+    const [queued, existed] = this.getQueued(id, ...args);
+    if (existed) {
+      await asyncNOP();
     }
 
     const releaser = await queued.releaser;
@@ -72,6 +55,43 @@ export class ReentrantMutex<A extends unknown[]>
       released = true;
       this.release(queued, releaser);
     };
+  }
+
+  /**
+   * Get a queued domain object
+   * @param id The domain to get the queued information for
+   * @param args Passed to the underlying mutex
+   * @returns The queued information, and a boolean that is true if the domain existed.
+   */
+  private getQueued(id: unknown, ...args: A): [Queued, boolean] {
+    if (this.greedy) {
+      return this.getQueuedGreedy(id, ...args);
+    } else {
+      return this.getQueuedUngreedy(id, ...args);
+    }
+  }
+
+  private getQueuedGreedy(id: unknown, ...args: A): [Queued, boolean] {
+    const existing = this.lockMap.get(id);
+    if (existing) {
+      return [existing, true];
+    } else {
+      const queued = this.createQueued(id, ...args);
+      this.lockMap.set(id, queued);
+      return [queued, false];
+    }
+  }
+
+  private getQueuedUngreedy(id: unknown, ...args: A): [Queued, boolean] {
+    if (!this.latest || this.latest.id !== id) {
+      const queued = this.createQueued(id, ...args);
+      this.latest = queued;
+      return [queued, false];
+    } else {
+      const queued = this.latest;
+      queued.reentrants++;
+      return [queued, true];
+    }
   }
 
   private createQueued(id: unknown, ...args: A) {
