@@ -67,6 +67,41 @@ describe("Reentrant Mutex", () => {
     ]);
   });
 
+  it("allows a domain to skip the line if greedy", async () => {
+    const lock = new ReentrantMutex(() => new Mutex());
+    const d1 = { type: "d1" };
+    const d2 = { type: "d2" };
+    const data: string[] = [];
+
+    const f1 = async () => {
+      const r1 = await lock.acquire(d1);
+      data.push("d1-1");
+      for (let i = 0; i < 5; i++) {
+        await asyncNOP();
+      }
+      const r2 = await lock.acquire(d1);
+      for (let i = 0; i < 5; i++) {
+        await asyncNOP();
+      }
+      data.push("d1-2");
+      r1();
+      r2();
+    };
+
+    const f2 = async () => {
+      const r = await lock.acquire(d2);
+      for (let i = 0; i < 5; i++) {
+        await asyncNOP();
+      }
+      data.push("d2-1");
+      r();
+    };
+
+    await Promise.all([f1(), f2()]);
+
+    expect(data).toStrictEqual(["d1-1", "d1-2", "d2-1"]);
+  });
+
   it("release function is idempotent", async () => {
     const lock = new ReentrantMutex(() => new Mutex());
 
