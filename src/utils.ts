@@ -1,4 +1,4 @@
-import { Releaser } from "./interfaces";
+import type { Releaser } from "./interfaces";
 
 /** Forces a function to pause and move itself to the back of the event loop */
 export const asyncNOP = async () => new Promise<void>((resolve) => resolve());

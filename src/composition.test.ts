@@ -1,5 +1,5 @@
-import { Mutex } from "async-mutex";
 import { describe, it, expect } from "vitest";
+import { Mutex } from "./mutex";
 import { KeyedMutex } from "./keyed";
 import { LockTypes, RWMutex } from "./readwrite";
 import { Domain, ReentrantMutex } from "./reentrant";

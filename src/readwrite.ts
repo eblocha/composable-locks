@@ -1,4 +1,4 @@
-import { ILock, Releaser } from "./interfaces";
+import type { ILock, Releaser } from "./interfaces";
 
 /** Forces a function to pause and move itself to the back of the event loop */
 const asyncNOP = async () => new Promise<void>((resolve) => resolve());

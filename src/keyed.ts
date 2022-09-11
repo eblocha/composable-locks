@@ -1,4 +1,4 @@
-import { ILock, Releaser } from "./interfaces";
+import type { ILock, Releaser } from "./interfaces";
 
 export type Resolver<K extends string | number | symbol = string> = (
   key: K

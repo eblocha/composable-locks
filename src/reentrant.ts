@@ -1,4 +1,4 @@
-import { ILock, Releaser } from "./interfaces";
+import type { ILock, Releaser } from "./interfaces";
 import { asyncNOP } from "./utils";
 
 /** Class used for domain identity (referential equality) */

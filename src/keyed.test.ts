@@ -1,4 +1,4 @@
-import { Mutex } from "async-mutex";
+import { Mutex } from "./mutex";
 import { describe, it, expect } from "vitest";
 import { KeyedMutex } from "./keyed";
 import { asyncNOP, withPermissions } from "./utils";
