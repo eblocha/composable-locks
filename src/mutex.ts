@@ -5,8 +5,7 @@ export class Mutex implements ILock<[]> {
   protected _locking = Promise.resolve();
 
   acquire(): Promise<Releaser> {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    let unlockNext = () => {};
+    let unlockNext: Releaser;
     const willLock = new Promise<void>((resolve) => {
       unlockNext = () => resolve();
     });
