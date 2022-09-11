@@ -83,12 +83,4 @@ export class KeyedMutex<
       released = true;
     };
   }
-
-  public async waitForUnlock(key: TKey, ...args: TArgs): Promise<void> {
-    const resolved = this.resolver(key);
-    const record = this.locks[resolved];
-    if (record) {
-      return await record.lock.waitForUnlock(...args);
-    }
-  }
 }

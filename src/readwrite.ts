@@ -20,13 +20,4 @@ export class RWMutex<A extends unknown[]>
         return super.acquire(new Domain(), ...args);
     }
   }
-
-  public async waitForUnlock(type: LockTypes, ...args: A): Promise<void> {
-    switch (type) {
-      case LockTypes.READ:
-        return super.waitForUnlock(this.readerDomain, ...args);
-      case LockTypes.WRITE:
-        return super.waitForUnlock(new Domain(), ...args);
-    }
-  }
 }

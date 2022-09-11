@@ -66,8 +66,4 @@ export class ReentrantMutex<A extends unknown[]>
       }
     };
   }
-
-  public async waitForUnlock(id: unknown, ...args: A): Promise<void> {
-    (await this.acquire(id, ...args))();
-  }
 }

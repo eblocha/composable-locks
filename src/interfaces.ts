@@ -5,5 +5,4 @@ export type Releaser = () => void;
  */
 export interface ILock<TArgs extends unknown[]> {
   acquire(...args: TArgs): Promise<Releaser>;
-  waitForUnlock(...args: TArgs): Promise<void>;
 }

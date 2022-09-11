@@ -16,8 +16,4 @@ export class Mutex implements ILock<[]> {
 
     return willUnlock;
   }
-
-  waitForUnlock(): Promise<void> {
-    return this._locking;
-  }
 }
