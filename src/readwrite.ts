@@ -12,7 +12,7 @@ export class RWMutex<A extends unknown[]>
 {
   protected readerDomain = new Domain();
 
-  public async acquire(type: LockTypes, ...args: A): Promise<Releaser> {
+  public acquire(type: LockTypes, ...args: A): Promise<Releaser> {
     switch (type) {
       case LockTypes.READ:
         return super.acquire(this.readerDomain, ...args);

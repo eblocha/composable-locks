@@ -21,8 +21,7 @@ export class KeyedMutex<
     TKey,
     LockRecord<ILock<TArgs>>
   >;
-  resolver: Resolver<TKey>;
-  newLock: () => ILock<TArgs>;
+  protected resolver: Resolver<TKey>;
 
   /**
    * A keyed lock, for mapping strings to a lock type
@@ -30,9 +29,11 @@ export class KeyedMutex<
    * @param resolver A function to transform a key into a normalized form.
    * Useful for resolving paths.
    */
-  constructor(newLock: () => ILock<TArgs>, resolver?: Resolver<TKey>) {
+  constructor(
+    protected newLock: () => ILock<TArgs>,
+    resolver?: Resolver<TKey>
+  ) {
     this.resolver = resolver ?? ((key) => key);
-    this.newLock = newLock;
   }
 
   private getOrCreateLock(key: TKey): LockRecord<ILock<TArgs>> {
@@ -45,19 +46,6 @@ export class KeyedMutex<
     };
     this.locks[key] = newRecord;
     return newRecord;
-  }
-
-  public async withLock<T>(
-    key: TKey,
-    f: () => T | Promise<T>,
-    ...args: TArgs
-  ): Promise<T> {
-    const release = await this.acquire(this.resolver(key), ...args);
-    try {
-      return await f();
-    } finally {
-      release();
-    }
   }
 
   public async acquire(key: TKey, ...args: TArgs): Promise<Releaser> {
