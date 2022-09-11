@@ -4,6 +4,12 @@ import { asyncNOP } from "./utils";
 /** Class used for domain identity (referential equality) */
 export class Domain {}
 
+type Queued<T = unknown> = {
+  id: T;
+  reentrants: number;
+  releaser: Promise<Releaser>;
+};
+
 /**
  * A re-entrant Mutex.
  *
@@ -21,14 +27,9 @@ export class Domain {}
 export class ReentrantMutex<A extends unknown[]>
   implements ILock<[unknown, ...A]>
 {
-  /** The current domain that does not have to wait to acquire */
-  protected holder: unknown | null = null;
-  /** The number of times the current domain has acquired the lock */
-  protected reentrants = 0;
-  /** The lock */
+  protected latest: Queued | null = null;
   protected lock: ILock<A>;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected releaser: Releaser = () => {};
+  protected chain = Promise.resolve();
 
   constructor(newLock: () => ILock<A>) {
     this.lock = newLock();
@@ -40,44 +41,34 @@ export class ReentrantMutex<A extends unknown[]>
    * @returns A function to release the lock. A domain *must* call all releasers before exiting.
    */
   public async acquire(id: unknown, ...args: A) {
-    if (this.holder === null) {
-      // if holder is null, we acquire right away.
-      this.holder = id;
-      this.releaser = await this.lock.acquire(...args);
-    } else if (id === this.holder) {
-      // wait one tick to take the same number of ticks as actually acquiring
-      await asyncNOP();
+    let queued: Queued;
+
+    if (!this.latest || this.latest.id !== id) {
+      queued = { id, reentrants: 1, releaser: this.lock.acquire(...args) };
+      this.latest = queued;
     } else {
-      // wait until the current domain releases.
-      this.releaser = await this.lock.acquire(...args);
-      // once acquired, set ourselves to the current holder
-      this.holder = id;
+      queued = this.latest;
+      queued.reentrants++;
+      await asyncNOP();
     }
 
-    // if we are here, we are the current domain. Increment re-entrants.
-    this.reentrants++;
+    const releaser = await queued.releaser;
 
-    // ensure idempotence
     let released = false;
-
     return () => {
       if (released) return;
-      // When releasing, decrement the re-entrants.
-      this.reentrants--;
-      if (this.reentrants === 0) {
-        // if we are the last one, release the mutex.
-        this.holder = null;
-        this.releaser();
-      }
       released = true;
+      queued.reentrants--;
+      if (queued.reentrants === 0) {
+        if (this.latest === queued) {
+          this.latest = null;
+        }
+        releaser();
+      }
     };
   }
 
   public async waitForUnlock(id: unknown, ...args: A): Promise<void> {
-    if (!this.holder || id === this.holder) {
-      await asyncNOP();
-    } else {
-      await this.lock.waitForUnlock(...args);
-    }
+    (await this.acquire(id, ...args))();
   }
 }

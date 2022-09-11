@@ -28,6 +28,15 @@ describe("Base RW Lock", () => {
   };
 
   const tests: TestCase[] = [
+    {
+      locks: [
+        LockTypes.READ,
+        LockTypes.READ,
+        LockTypes.WRITE,
+        LockTypes.READ,
+        LockTypes.READ,
+      ],
+    },
     { locks: [LockTypes.READ, LockTypes.WRITE, LockTypes.READ] },
     { locks: [LockTypes.WRITE, LockTypes.READ] },
     { locks: [LockTypes.READ, LockTypes.WRITE] },

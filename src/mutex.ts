@@ -2,7 +2,7 @@ import type { ILock, Releaser } from "./interfaces";
 
 // inspired from https://github.com/mgtitimoli/await-mutex, with some tweaks for typescript
 export class Mutex implements ILock<[]> {
-  private _locking = Promise.resolve();
+  protected _locking = Promise.resolve();
 
   acquire(): Promise<Releaser> {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
