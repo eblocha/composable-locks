@@ -1,5 +1,6 @@
 import type { ILock, Releaser } from "./interfaces";
 
+// inspired from https://github.com/mgtitimoli/await-mutex, with some tweaks for typescript
 export class Mutex implements ILock<[]> {
   private _locking = Promise.resolve();
 
@@ -11,13 +12,12 @@ export class Mutex implements ILock<[]> {
     });
 
     const willUnlock = this._locking.then(() => unlockNext);
-
     this._locking = this._locking.then(() => willLock);
 
     return willUnlock;
   }
 
-  async waitForUnlock(): Promise<void> {
-    await this._locking;
+  waitForUnlock(): Promise<void> {
+    return this._locking;
   }
 }
