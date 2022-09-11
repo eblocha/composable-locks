@@ -29,7 +29,6 @@ export class ReentrantMutex<A extends unknown[]>
 {
   protected latest: Queued | null = null;
   protected lock: ILock<A>;
-  protected chain = Promise.resolve();
 
   constructor(newLock: () => ILock<A>) {
     this.lock = newLock();

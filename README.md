@@ -43,7 +43,7 @@ You _can't_ use this module to lock resources _across_ node processes.
 
 ## Basic Mutex
 
-Starting with a basic mutex, re-exported from [async-mutex](https://github.com/DirtyHairy/async-mutex)
+Starting with a basic mutex:
 
 ```ts
 import { Mutex } from "composable-locks";
@@ -89,6 +89,8 @@ read();
 write();
 read();
 ```
+
+Note that a read-write mutex is just a special type of re-entrant mutex. The readers all share a domain, and all writers have unique domains.
 
 ## Re-Entrant Mutex
 
