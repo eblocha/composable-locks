@@ -32,5 +32,22 @@ describe("Mutex", () => {
     expect(data).toStrictEqual(delayTicks);
   });
 
-  it("releaser is idempotent");
+  it("releaser is idempotent", async () => {
+    const lock = new Mutex();
+    const data: number[] = [];
+    const delayTicks: number[] = [5, 2, 8, 7];
+
+    const fn = async (ticks: number) => {
+      const releaser = await lock.acquire();
+      for (let i = 0; i < ticks; i++) {
+        await asyncNOP();
+      }
+      data.push(ticks);
+      releaser();
+      releaser();
+    };
+
+    await Promise.all(delayTicks.map((ticks) => fn(ticks)));
+    expect(data).toStrictEqual(delayTicks);
+  });
 });
