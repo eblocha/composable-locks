@@ -1,6 +1,7 @@
 import { Mutex } from "./mutex";
 import { describe, it, expect } from "vitest";
 import { RWMutex, LockTypes } from "./readwrite";
+import * as fc from "fast-check";
 
 const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
   const release = await lock.acquire(LockTypes.READ);
@@ -23,111 +24,81 @@ const withWrite = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
 const newMutex = () => new RWMutex(() => new Mutex());
 
 describe("Base RW Lock", () => {
-  type TestCase = {
-    locks: LockTypes[];
-  };
+  const arbitraryLockType = fc.oneof(
+    fc.constant(LockTypes.READ),
+    fc.constant(LockTypes.WRITE)
+  );
 
-  const tests: TestCase[] = [
-    {
-      locks: [
-        LockTypes.READ,
-        LockTypes.READ,
-        LockTypes.WRITE,
-        LockTypes.READ,
-        LockTypes.READ,
-      ],
-    },
-    { locks: [LockTypes.READ, LockTypes.WRITE, LockTypes.READ] },
-    { locks: [LockTypes.WRITE, LockTypes.READ] },
-    { locks: [LockTypes.READ, LockTypes.WRITE] },
-    {
-      locks: [
-        LockTypes.READ,
-        LockTypes.READ,
-        LockTypes.WRITE,
-        LockTypes.READ,
-        LockTypes.READ,
-        LockTypes.WRITE,
-        LockTypes.READ,
-      ],
-    },
-    {
-      locks: [
-        LockTypes.READ,
-        LockTypes.READ,
-        LockTypes.WRITE,
-        LockTypes.READ,
-        LockTypes.READ,
-        LockTypes.READ,
-        LockTypes.READ,
-        LockTypes.WRITE,
-        LockTypes.READ,
-        LockTypes.WRITE,
-        LockTypes.WRITE,
-        LockTypes.READ,
-      ],
-    },
-  ];
+  it("Maintains order", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(arbitraryLockType, { minLength: 2, maxLength: 20 }),
+        async (locks: LockTypes[]) => {
+          const lock = newMutex();
+          const data: string[] = [];
 
-  it.each(tests)("Maintains order: $locks", async ({ locks }) => {
-    const lock = newMutex();
-    const data: string[] = [];
+          const expected = locks.map((type, index) => type + index.toString());
 
-    const expected = locks.map((type, index) => type + index.toString());
-
-    // eslint-disable-next-line @typescript-eslint/require-await
-    const fn = async (index: number) => {
-      const e = expected[index];
-      if (e) data.push(e);
-    };
-    await Promise.all(
-      locks.map((type, index) =>
-        type === LockTypes.READ
-          ? withRead(lock, () => fn(index))
-          : withWrite(lock, () => fn(index))
-      )
+          const fn = (index: number) => {
+            const e = expected[index];
+            if (e) data.push(e);
+            return Promise.resolve();
+          };
+          await Promise.all(
+            locks.map((type, index) =>
+              type === LockTypes.READ
+                ? withRead(lock, () => fn(index))
+                : withWrite(lock, () => fn(index))
+            )
+          );
+          expect(data).toStrictEqual(expected);
+        }
+      ),
+      { timeout: 500 }
     );
-    expect(data).toStrictEqual(expected);
   });
 
   const asyncNOP = async () => new Promise<void>((resolve) => resolve());
 
   it("Maintains order with uneven event loop ticks", async () => {
-    const lock = newMutex();
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(fc.tuple(arbitraryLockType, fc.integer({ min: 0, max: 10 })), {
+          minLength: 2,
+          maxLength: 20,
+        }),
+        async (pairs) => {
+          const lock = newMutex();
 
-    const data: string[] = [];
+          const data: string[] = [];
+          const expected = pairs.map(
+            ([type], index) => type + index.toString()
+          );
 
-    const locks = [
-      LockTypes.READ,
-      LockTypes.READ,
-      LockTypes.WRITE,
-      LockTypes.READ,
-      LockTypes.READ,
-      LockTypes.WRITE,
-      LockTypes.READ,
-    ];
+          const ticks = pairs.map(([, ticks]) => ticks);
+          const types = pairs.map(([type]) => type);
 
-    const expected = locks.map((type, index) => type + index.toString());
+          const fn = async (index: number) => {
+            const e = expected[index];
+            if (e) data.push(e);
+            const t = ticks[index] ?? 0;
+            for (let i = 0; i < t; i++) {
+              await asyncNOP();
+            }
+          };
 
-    const ticks = [5, 2, 7, 10, 2, 0, 1];
-
-    const fn = async (index: number) => {
-      const e = expected[index];
-      if (e) data.push(e);
-      const t = ticks[index] ?? 0;
-      for (let i = 0; i < t; i++) {
-        await asyncNOP();
-      }
-    };
-
-    await Promise.all(
-      locks.map((type, index) =>
-        type === LockTypes.READ
-          ? withRead(lock, () => fn(index))
-          : withWrite(lock, () => fn(index))
-      )
+          await Promise.all(
+            types.map((type, index) =>
+              type === LockTypes.READ
+                ? withRead(lock, () => fn(index))
+                : withWrite(lock, () => fn(index))
+            )
+          );
+          expect(data).toStrictEqual(expected);
+        }
+      ),
+      { timeout: 500 }
     );
-    expect(data).toStrictEqual(expected);
   });
 
   it("Allows concurrent readers", async () => {
