@@ -2,6 +2,7 @@ import { Mutex } from "./mutex";
 import { describe, it, expect } from "vitest";
 import { RWMutex, LockTypes } from "./readwrite";
 import * as fc from "fast-check";
+import { asyncNOP } from "./test-utils";
 
 const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
   const release = await lock.acquire(LockTypes.READ);
@@ -57,8 +58,6 @@ describe("Base RW Lock", () => {
       { timeout: 500 }
     );
   });
-
-  const asyncNOP = async () => new Promise<void>((resolve) => resolve());
 
   it("Maintains order with uneven event loop ticks", async () => {
     await fc.assert(

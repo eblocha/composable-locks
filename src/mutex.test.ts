@@ -1,6 +1,7 @@
 import { Mutex } from "./mutex";
 import { describe, expect, it } from "vitest";
-import { asyncNOP, withPermissions } from "./utils";
+import { withPermissions } from "./utils";
+import { asyncNOP } from "./test-utils";
 
 describe("Mutex", () => {
   it(

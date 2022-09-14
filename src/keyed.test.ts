@@ -1,7 +1,8 @@
 import { Mutex } from "./mutex";
 import { describe, it, expect } from "vitest";
 import { KeyedMutex } from "./keyed";
-import { asyncNOP, withPermissions } from "./utils";
+import { withPermissions } from "./utils";
+import { asyncNOP } from "./test-utils";
 
 describe("Keyed lock", () => {
   it("allows different keys to lock independently", async () => {

@@ -3,7 +3,8 @@ import { Mutex } from "./mutex";
 import { KeyedMutex } from "./keyed";
 import { LockTypes, RWMutex } from "./readwrite";
 import { Domain, ReentrantMutex } from "./reentrant";
-import { asyncNOP, withPermissions } from "./utils";
+import { withPermissions } from "./utils";
+import { asyncNOP } from "./test-utils";
 
 describe("Lock composition", () => {
   it("allows concurrent writers in the same re-entrant domain", async () => {
