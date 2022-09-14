@@ -26,7 +26,7 @@ describe("Keyed lock", () => {
     expect(data).toStrictEqual(expected);
   });
 
-  it("maintains exclusivity with different keys", async () => {
+  it("maintains exclusivity with equal keys", async () => {
     const lock = new KeyedMutex(() => new Mutex());
     const data: number[] = [];
     const delayTicks: number[] = [5, 2];
