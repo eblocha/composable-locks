@@ -12,8 +12,8 @@ export class RWMutex<A extends unknown[]>
 {
   protected readerDomain = new Domain();
 
-  constructor(newLock: () => ILock<A>) {
-    super(newLock, false);
+  constructor(newLock: () => ILock<A>, preferRead = false) {
+    super(newLock, preferRead);
   }
 
   public acquire(type: LockTypes, ...args: A): Promise<Releaser> {

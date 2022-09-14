@@ -100,6 +100,56 @@ describe("Base RW Lock", () => {
     );
   });
 
+  it("Starves writers if preferRead is true", async () => {
+    type LockData = {
+      type: LockTypes;
+      index: number;
+    };
+
+    await fc.assert(
+      fc.asyncProperty(
+        fc.array(arbitraryLockType, { minLength: 2, maxLength: 20 }),
+        async (locks: LockTypes[]) => {
+          // inject read to force starvation behavior
+          locks.splice(0, 0, LockTypes.READ);
+
+          const lock = new RWMutex(() => new Mutex(), true);
+          const data: string[] = [];
+          const lockData: LockData[] = locks.map((type, index) => ({
+            type,
+            index,
+          }));
+          const reads = lockData.filter((data) => data.type === LockTypes.READ);
+          const writes = lockData.filter(
+            (data) => data.type === LockTypes.WRITE
+          );
+
+          const toString = (type: LockTypes, index: number) =>
+            `${type}${index}`;
+
+          // reads all come before writers, in order
+          const expected = [
+            ...reads.map((data) => toString(data.type, data.index)),
+            ...writes.map((data) => toString(data.type, data.index)),
+          ];
+
+          const fn = (type: LockTypes, index: number) => {
+            data.push(toString(type, index));
+            return Promise.resolve();
+          };
+          await Promise.all(
+            locks.map((type, index) =>
+              type === LockTypes.READ
+                ? withRead(lock, () => fn(type, index))
+                : withWrite(lock, () => fn(type, index))
+            )
+          );
+          expect(data).toStrictEqual(expected);
+        }
+      )
+    );
+  });
+
   it("Allows concurrent readers", async () => {
     const lock = newMutex();
 
