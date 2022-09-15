@@ -1,8 +1,6 @@
 import type { ILock, Releaser } from "./interfaces";
 
-export type Resolver<K extends string | number | symbol = string> = (
-  key: K
-) => K;
+export type Resolver<K> = (key: K) => K;
 
 type LockRecord<T> = {
   count: number;
@@ -14,7 +12,7 @@ type LockRecord<T> = {
  */
 export class KeyedMutex<
   TArgs extends unknown[],
-  TKey extends string | number | symbol = string
+  TKey extends string | number | symbol
 > implements ILock<[TKey, ...TArgs]>
 {
   protected locks: Record<TKey, LockRecord<ILock<TArgs>>> = {} as Record<
