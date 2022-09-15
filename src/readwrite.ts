@@ -1,14 +1,11 @@
 import type { ILock, Releaser } from "./interfaces";
 import { Domain, ReentrantMutex } from "./reentrant";
 
-export enum LockTypes {
-  READ = "read",
-  WRITE = "write",
-}
+export type RWLockType = "read" | "write";
 
 export class RWMutex<A extends unknown[]>
   extends ReentrantMutex<A>
-  implements ILock<[LockTypes, ...A]>
+  implements ILock<[RWLockType, ...A]>
 {
   protected readerDomain = new Domain();
 
@@ -16,11 +13,11 @@ export class RWMutex<A extends unknown[]>
     super(newLock, preferRead);
   }
 
-  public acquire(type: LockTypes, ...args: A): Promise<Releaser> {
+  public acquire(type: RWLockType, ...args: A): Promise<Releaser> {
     switch (type) {
-      case LockTypes.READ:
+      case "read":
         return super.acquire(this.readerDomain, ...args);
-      case LockTypes.WRITE:
+      case "write":
         return super.acquire(new Domain(), ...args);
     }
   }

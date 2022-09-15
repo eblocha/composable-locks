@@ -1,11 +1,11 @@
 import { Mutex } from "./mutex";
 import { describe, it, expect } from "vitest";
-import { RWMutex, LockTypes } from "./readwrite";
+import { RWMutex, RWLockType } from "./readwrite";
 import * as fc from "fast-check";
 import { asyncNOP } from "./test-utils";
 
 const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
-  const release = await lock.acquire(LockTypes.READ);
+  const release = await lock.acquire("read");
   try {
     await cb();
   } finally {
@@ -14,7 +14,7 @@ const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
 };
 
 const withWrite = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
-  const release = await lock.acquire(LockTypes.WRITE);
+  const release = await lock.acquire("write");
   try {
     await cb();
   } finally {
@@ -26,15 +26,15 @@ const newMutex = () => new RWMutex(() => new Mutex());
 
 describe("Base RW Lock", () => {
   const arbitraryLockType = fc.oneof(
-    fc.constant(LockTypes.READ),
-    fc.constant(LockTypes.WRITE)
+    fc.constant("read" as RWLockType),
+    fc.constant("write" as RWLockType)
   );
 
   it("Maintains order", async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.array(arbitraryLockType, { minLength: 2, maxLength: 20 }),
-        async (locks: LockTypes[]) => {
+        async (locks: RWLockType[]) => {
           const lock = newMutex();
           const data: string[] = [];
 
@@ -47,7 +47,7 @@ describe("Base RW Lock", () => {
           };
           await Promise.all(
             locks.map((type, index) =>
-              type === LockTypes.READ
+              type === "read"
                 ? withRead(lock, () => fn(index))
                 : withWrite(lock, () => fn(index))
             )
@@ -88,7 +88,7 @@ describe("Base RW Lock", () => {
 
           await Promise.all(
             types.map((type, index) =>
-              type === LockTypes.READ
+              type === "read"
                 ? withRead(lock, () => fn(index))
                 : withWrite(lock, () => fn(index))
             )
@@ -102,16 +102,16 @@ describe("Base RW Lock", () => {
 
   it("Starves writers if preferRead is true", async () => {
     type LockData = {
-      type: LockTypes;
+      type: RWLockType;
       index: number;
     };
 
     await fc.assert(
       fc.asyncProperty(
         fc.array(arbitraryLockType, { minLength: 2, maxLength: 20 }),
-        async (locks: LockTypes[]) => {
+        async (locks: RWLockType[]) => {
           // inject read to force starvation behavior
-          locks.splice(0, 0, LockTypes.READ);
+          locks.splice(0, 0, "read");
 
           const lock = new RWMutex(() => new Mutex(), true);
           const data: string[] = [];
@@ -119,12 +119,10 @@ describe("Base RW Lock", () => {
             type,
             index,
           }));
-          const reads = lockData.filter((data) => data.type === LockTypes.READ);
-          const writes = lockData.filter(
-            (data) => data.type === LockTypes.WRITE
-          );
+          const reads = lockData.filter((data) => data.type === "read");
+          const writes = lockData.filter((data) => data.type === "write");
 
-          const toString = (type: LockTypes, index: number) =>
+          const toString = (type: RWLockType, index: number) =>
             `${type}${index}`;
 
           // reads all come before writers, in order
@@ -133,13 +131,13 @@ describe("Base RW Lock", () => {
             ...writes.map((data) => toString(data.type, data.index)),
           ];
 
-          const fn = (type: LockTypes, index: number) => {
+          const fn = (type: RWLockType, index: number) => {
             data.push(toString(type, index));
             return Promise.resolve();
           };
           await Promise.all(
             locks.map((type, index) =>
-              type === LockTypes.READ
+              type === "read"
                 ? withRead(lock, () => fn(type, index))
                 : withWrite(lock, () => fn(type, index))
             )
@@ -192,15 +190,15 @@ describe("Base RW Lock", () => {
     const data: string[] = [];
 
     const write = async () => {
-      const r = await lock.acquire(LockTypes.WRITE);
+      const r = await lock.acquire("write");
       data.push("write");
       r();
     };
 
     // acquire 2 readers, but release 1 of them twice. Before releasing the second reader, try to acquire a writer.
     // The writer should finish last
-    const release1 = await lock.acquire(LockTypes.READ);
-    const release2Promise = lock.acquire(LockTypes.READ);
+    const release1 = await lock.acquire("read");
+    const release2Promise = lock.acquire("read");
     data.push("read1");
 
     // try to trick the lock into thinking we released the second writer

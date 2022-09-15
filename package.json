@@ -23,6 +23,7 @@
     "import": "./dist/index.mjs",
     "default": "./dist/index.mjs"
   },
+  "sideEffects": false,
   "author": "eblocha",
   "license": "LGPL-3.0-or-later",
   "homepage": "https://github.com/eblocha/composable-locks#readme",

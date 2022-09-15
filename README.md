@@ -11,7 +11,7 @@ This library provides a number of different lock types:
 
 Like the package name entails, you can compose these lock types to create a multi-featured lock.
 
-This library can be use both in the browser or in nodejs. The most exotic globals used are:
+This library can be used both in the browser or in node. The most exotic globals used are:
 
 - Promise (and Promise.resolve)
 - Map (get, set, delete)
@@ -98,7 +98,17 @@ write();
 read();
 ```
 
-Note that a read-write mutex is just a special type of re-entrant mutex. The readers all share a domain, and all writers have unique domains.
+### Read-Preferring Mode
+
+By default, the read-write lock is write-preferring, which means it will not allow readers to "skip the line", and go before queued writers.
+
+If you want to switch to read-preferring, you can do so with another argument to the constructor:
+
+```ts
+const mutex = new RWMutex(() => new Mutex(), true);
+```
+
+This will increase the concurrency capability for reads, but may starve writes, so use caution.
 
 ## Re-Entrant Mutex
 
