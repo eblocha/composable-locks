@@ -33,7 +33,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc --noEmit && yarn clean && microbundle --target node --raw",
+    "build": "yarn clean && microbundle --target node --raw",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint ./src --ext=ts",
