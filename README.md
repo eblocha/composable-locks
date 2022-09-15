@@ -1,12 +1,15 @@
-# Composable Re-entrant, Keyed, and Read-Write Locks for Javascript
+# Composable-Locks
 
-This library provides a number of different concurrency locks:
+Composable concurrency locks for Javascript.
 
-- Read-write lock: for locking resources efficiently
-- Re-entrant lock: for recursive functions that need to lock resources
-- Keyed lock: for managing multiple locks by key. Useful for locking files.
+This library provides a number of different lock types:
 
-These locks can be inter-mingled to combine their functionality.
+- Basic
+- Read-Write
+- Re-Entrant
+- Keyed
+
+Like the package name entails, you can compose these lock types to create a multi-featured lock.
 
 ## Install
 
@@ -165,7 +168,7 @@ const domain = new Domain();
 await lock.acquire(domain, key, LockTypes.READ);
 ```
 
-## Helper Functions
+## Utility Functions
 
 ### withPermissions
 
