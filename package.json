@@ -1,10 +1,9 @@
 {
   "name": "composable-locks",
   "version": "0.3.5",
+  "description": "Composable concurrency locks for Javascript.",
   "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+    "dist"
   ],
   "keywords": [
     "mutex",
@@ -13,8 +12,17 @@
     "composable",
     "async"
   ],
+  "source": "./src/index.ts",
+  "module": "./dist/index.mjs",
   "main": "./dist/index.js",
+  "umd:main": "./dist/index.umd.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs",
+    "default": "./dist/index.mjs"
+  },
   "author": "eblocha",
   "license": "LGPL-3.0-or-later",
   "homepage": "https://github.com/eblocha/composable-locks#readme",
@@ -24,7 +32,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "yarn clean && tsc",
+    "build": "tsc --noEmit && yarn clean && microbundle --target node --raw",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint ./src --ext=ts",
@@ -36,6 +44,7 @@
     "@vitest/coverage-c8": "^0.23.2",
     "eslint": "^8.23.0",
     "fast-check": "^3.1.3",
+    "microbundle": "^0.15.1",
     "typescript": "^4.8.3",
     "vite": "^3.1.0",
     "vitest": "^0.23.2"

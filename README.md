@@ -11,6 +11,11 @@ This library provides a number of different lock types:
 
 Like the package name entails, you can compose these lock types to create a multi-featured lock.
 
+This library can be use both in the browser or in nodejs. The most exotic globals used are:
+
+- Promise (and Promise.resolve)
+- Map (get, set, delete)
+
 ## Install
 
 ```
