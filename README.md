@@ -16,6 +16,14 @@ This library can be used both in the browser or in node. The most exotic globals
 - Promise (and Promise.resolve)
 - Map (get, set, delete)
 
+**Highlights**
+
+- 📦 Tiny, and tree-shakeable. Just [854 bytes](https://bundlephobia.com/package/composable-locks@0.4.0) minified and gzipped.
+- 🕸️ Zero dependencies.
+- 🧪 100% test coverage. Uses [fast-check](https://github.com/dubzzz/fast-check) for property-based unit testing.
+- 🔥 Fast. No arrays or queues. Just Promises and Maps.
+- 🛡️ 100% Typescript, no `any`.
+
 ## Install
 
 ```
