@@ -70,12 +70,12 @@ const mutex = new Mutex();
 Using a read-write mutex, you can allow multiple readers to acquire the lock, where writers need exclusive access:
 
 ```ts
-import { RWMutex, LockTypes } from "composable-locks";
+import { RWMutex } from "composable-locks";
 
 const mutex = new RWMutex(() => new Mutex());
 
 const read = async () => {
-  const release = await mutex.acquire(LockTypes.READ);
+  const release = await mutex.acquire("read");
   try {
     // do some stuff...
   } finally {
@@ -84,7 +84,7 @@ const read = async () => {
 };
 
 const write = async () => {
-  const release = await mutex.acquire(LockTypes.WRITE);
+  const release = await mutex.acquire("write");
   try {
     // do some stuff...
   } finally {
@@ -170,7 +170,6 @@ import {
   ReentrantMutex,
   RWMutex,
   Mutex,
-  LockTypes,
   Domain,
 } from "composable-locks";
 
@@ -180,7 +179,7 @@ const lock = new ReentrantMutex(
 
 const domain = new Domain();
 
-await lock.acquire(domain, key, LockTypes.READ);
+await lock.acquire(domain, key, "read");
 ```
 
 ## Utility Functions
