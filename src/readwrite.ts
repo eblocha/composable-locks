@@ -1,24 +1,22 @@
 import type { ILock, Releaser } from "./interfaces";
-import { Domain, ReentrantMutex } from "./reentrant";
+import { ReentrantMutex } from "./reentrant";
 
 export type RWLockType = "read" | "write";
 
-export class RWMutex<A extends unknown[]>
-  extends ReentrantMutex<A>
-  implements ILock<[RWLockType, ...A]>
-{
-  protected readerDomain = new Domain();
+export class RWMutex<A extends unknown[]> implements ILock<[RWLockType, ...A]> {
+  protected readerDomain = Symbol();
+  protected base: ReentrantMutex<A>;
 
   constructor(newLock: () => ILock<A>, preferRead = false) {
-    super(newLock, preferRead);
+    this.base = new ReentrantMutex(newLock, preferRead);
   }
 
   public acquire(type: RWLockType, ...args: A): Promise<Releaser> {
     switch (type) {
       case "read":
-        return super.acquire(this.readerDomain, ...args);
+        return this.base.acquire(this.readerDomain, ...args);
       case "write":
-        return super.acquire(new Domain(), ...args);
+        return this.base.acquire(Symbol(), ...args);
     }
   }
 }

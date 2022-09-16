@@ -1,6 +1,6 @@
 import { Mutex } from "./mutex";
 import { describe, it, expect } from "vitest";
-import { Domain, ReentrantMutex } from "./reentrant";
+import { ReentrantMutex } from "./reentrant";
 import { asyncNOP } from "./test-utils";
 
 describe("Reentrant Mutex", () => {
@@ -12,7 +12,7 @@ describe("Reentrant Mutex", () => {
     const delayTicks: number[] = [20, 2];
 
     const fn = async (ticks: number) => {
-      const id = new Domain();
+      const id = Symbol();
       data.push(`try ${ticks}`);
       const release = await lock.acquire(id);
       data.push(`start ${ticks}`);
@@ -42,7 +42,7 @@ describe("Reentrant Mutex", () => {
 
     const delayTicks: number[] = [20, 2];
 
-    const fn = async (id: Domain, ticks: number) => {
+    const fn = async (id: symbol, ticks: number) => {
       data.push(`try ${ticks}`);
       const release = await lock.acquire(id);
       data.push(`start ${ticks}`);
@@ -53,7 +53,7 @@ describe("Reentrant Mutex", () => {
       release();
     };
 
-    const id = new Domain();
+    const id = Symbol();
 
     await Promise.all(delayTicks.map((ticks) => fn(id, ticks)));
 
@@ -69,8 +69,8 @@ describe("Reentrant Mutex", () => {
 
   it("allows a domain to skip the line if greedy", async () => {
     const lock = new ReentrantMutex(() => new Mutex());
-    const d1 = { type: "d1" };
-    const d2 = { type: "d2" };
+    const d1 = Symbol("d1");
+    const d2 = Symbol("d2");
     const data: string[] = [];
 
     const f1 = async () => {
@@ -107,8 +107,8 @@ describe("Reentrant Mutex", () => {
 
     const data: string[] = [];
 
-    const id1 = new Domain();
-    const id2 = new Domain();
+    const id1 = Symbol();
+    const id2 = Symbol();
 
     // create 2 domains, and re-acquire lock in the first. Call the release function for the first aqcuisition twice.
     const release1 = await lock.acquire(id1);

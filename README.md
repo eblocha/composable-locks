@@ -13,7 +13,7 @@ Like the package name entails, you can compose these lock types to create a mult
 
 **Highlights**
 
-- 📦 Tiny, and tree-shakeable. Just [854 bytes](https://bundlephobia.com/package/composable-locks@0.4.0) minified and gzipped.
+- 📦 Tiny, and tree-shakeable. Under [900 bytes](https://bundlephobia.com/package/composable-locks) minified and gzipped.
 - 🕸️ Zero dependencies.
 - 🧪 100% test coverage. Uses [fast-check](https://github.com/dubzzz/fast-check) for property-based unit testing.
 - 🔥 Fast. No arrays or loops.
@@ -132,11 +132,11 @@ This will increase the concurrency capability for reads, but may starve writes, 
 A re-entrant mutex can re-acquire the lock. For example, to allow a recursive function to traverse a graph and visit the same node multiple times.
 
 ```ts
-import { ReentrantMutex, Mutex, Domain } from "composable-locks";
+import { ReentrantMutex, Mutex } from "composable-locks";
 
 const lock = new ReentrantMutex(() => new Mutex());
 
-const domain = new Domain();
+const domain = Symbol();
 
 const release1 = await lock.acquire(domain);
 const release2 = await lock.acquire(domain);
@@ -186,19 +186,13 @@ const releaseFile2 = await lock.acquire("./somedir/../somedir/file");
 You can compose these different mutex types together to combine functionality. Want a keyed, read-write, reentrant mutex? Just combine the components!
 
 ```ts
-import {
-  KeyedMutex,
-  ReentrantMutex,
-  RWMutex,
-  Mutex,
-  Domain,
-} from "composable-locks";
+import { KeyedMutex, ReentrantMutex, RWMutex, Mutex } from "composable-locks";
 
 const lock = new ReentrantMutex(
   () => new KeyedMutex(() => new RWMutex(() => new Mutex()))
 );
 
-const domain = new Domain();
+const domain = Symbol();
 
 await lock.acquire(domain, key, "read");
 ```

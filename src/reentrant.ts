@@ -1,10 +1,7 @@
 import type { ILock, Releaser } from "./interfaces";
 
-/** Class used for domain identity (referential equality) */
-export class Domain {}
-
-type Queued<T = unknown> = {
-  id: T;
+type Queued = {
+  id: symbol;
   reentrants: number;
   releaser: Promise<Releaser>;
 };
@@ -15,7 +12,7 @@ type Queued<T = unknown> = {
  * Usage:
  * ```
  * const lock = new ReentrantMutex()
- * const domain = new Domain()
+ * const domain = Symbol()
  *
  * const release1 = await lock.acquire(domain)
  * const release2 = await lock.acquire(domain)
@@ -24,11 +21,10 @@ type Queued<T = unknown> = {
  * ```
  */
 export class ReentrantMutex<A extends unknown[]>
-  implements ILock<[unknown, ...A]>
+  implements ILock<[symbol, ...A]>
 {
   protected latest: Queued | null = null;
-  // only Maps allow for objects as keys
-  protected lockMap: Map<unknown, Queued> = new Map();
+  protected lockMap: Record<symbol, Queued> = {};
   protected lock: ILock<A>;
 
   constructor(newLock: () => ILock<A>, private readonly greedy = true) {
@@ -40,7 +36,7 @@ export class ReentrantMutex<A extends unknown[]>
    * @param id The domain identifier.
    * @returns A function to release the lock. A domain *must* call all releasers before exiting.
    */
-  public async acquire(id: unknown, ...args: A) {
+  public async acquire(id: symbol, ...args: A) {
     const queued = this.getQueued(id, ...args);
 
     const releaser = await queued.releaser;
@@ -59,7 +55,7 @@ export class ReentrantMutex<A extends unknown[]>
    * @param args Passed to the underlying mutex
    * @returns The queued information, and a boolean that is true if the domain existed.
    */
-  private getQueued(id: unknown, ...args: A): Queued {
+  private getQueued(id: symbol, ...args: A): Queued {
     if (this.greedy) {
       return this.getQueuedGreedy(id, ...args);
     } else {
@@ -67,18 +63,18 @@ export class ReentrantMutex<A extends unknown[]>
     }
   }
 
-  private getQueuedGreedy(id: unknown, ...args: A): Queued {
-    const existing = this.lockMap.get(id);
+  private getQueuedGreedy(id: symbol, ...args: A): Queued {
+    const existing = this.lockMap[id];
     if (existing) {
       return existing;
     } else {
       const queued = this.createQueued(id, ...args);
-      this.lockMap.set(id, queued);
+      this.lockMap[id] = queued;
       return queued;
     }
   }
 
-  private getQueuedUngreedy(id: unknown, ...args: A): Queued {
+  private getQueuedUngreedy(id: symbol, ...args: A): Queued {
     if (!this.latest || this.latest.id !== id) {
       const queued = this.createQueued(id, ...args);
       this.latest = queued;
@@ -90,7 +86,7 @@ export class ReentrantMutex<A extends unknown[]>
     }
   }
 
-  private createQueued(id: unknown, ...args: A): Queued {
+  private createQueued(id: symbol, ...args: A): Queued {
     return {
       id,
       reentrants: 1,
@@ -100,7 +96,7 @@ export class ReentrantMutex<A extends unknown[]>
 
   private cleanup(queued: Queued) {
     if (this.greedy) {
-      this.lockMap.delete(queued.id);
+      delete this.lockMap[queued.id];
     } else if (this.latest === queued) {
       this.latest = null;
     }
