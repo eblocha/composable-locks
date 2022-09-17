@@ -13,7 +13,7 @@ Like the package name entails, you can compose these lock types to create a mult
 
 **Highlights**
 
-- 📦 Tiny, and tree-shakeable. Under [900 bytes](https://bundlephobia.com/package/composable-locks) minified and gzipped.
+- 📦 Tiny, and tree-shakeable. 672 bytes minified and gzipped if all features are used.
 - 🕸️ Zero dependencies.
 - 🧪 100% test coverage. Uses [fast-check](https://github.com/dubzzz/fast-check) for property-based unit testing.
 - 🔥 Fast. No arrays or loops.
@@ -37,7 +37,7 @@ npm install composable-locks
 You may need this module if you need to read data from an external source (like a file or database), modify it, then write it back. If you don't lock the resource, you might get the following scenario:
 
 ```ts
-const updateData = <T>(field: string, value: T) => {
+const updateData = async <T>(field: string, value: T) => {
   const dataFile = "data.json"
   const data = JSON.parse(
     await fs.promises.readFile(dataFile, { encoding: "utf-8" });
