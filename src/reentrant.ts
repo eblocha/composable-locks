@@ -11,7 +11,7 @@ type Queued = {
  *
  * Usage:
  * ```
- * const lock = new ReentrantMutex()
+ * const lock = new ReentrantMutex(() => new Mutex())
  * const domain = Symbol()
  *
  * const release1 = await lock.acquire(domain)
