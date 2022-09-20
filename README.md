@@ -129,7 +129,7 @@ This will increase the concurrency capability for reads, but may starve writes, 
 
 ## Re-Entrant Mutex
 
-A re-entrant mutex can re-acquire the lock. For example, to allow a recursive function to traverse a graph and visit the same node multiple times.
+A re-entrant mutex can re-acquire the lock.
 
 ```ts
 import { ReentrantMutex, Mutex } from "composable-locks";
@@ -143,6 +143,10 @@ const release2 = await lock.acquire(domain);
 release1();
 release2();
 ```
+
+If you find yourself reaching for this mutex, you may want to re-evaluate. It is very easy to end up deadlocking with this mutex.
+
+The re-entrant mutex is included because it is the underlying implementation behind the read-write mutex.
 
 ## Keyed Mutex
 
@@ -216,3 +220,43 @@ const result = await withPermissions(
   }
 );
 ```
+
+Be careful with this utility function. If you are dynamically acquiring locks based on a set of keys, make sure to dedupe the keys, or it _will_ deadlock.
+
+Acquire all the locks you _might_ need to complete the task at once. If you don't, it's very easy to end up deadlocking. For example, let's say you have a function, which needs access to multiple files.
+
+If you acquire the locks sequentially, you may end up with the following:
+
+```ts
+const func = async (files: string[]) => {
+  const releasers: Releaser[] = [];
+  for (const file of files) {
+    releasers.push(await lock.acquire(file));
+  }
+  // process data...
+  releasers.forEach((release) => release());
+};
+
+func(["fileA", "fileB"]);
+func(["fileB", "fileA"]);
+```
+
+This will deadlock. When `func(["fileA", "fileB"])` is called, it acquires "fileA" and goes to the back of the event queue. Then, the second call to `func` executes and acquires "fileB". The first call is then resumed and tries to acquire "fileB", which is already held. Both calls are waiting on each other to release. Deadlock.
+
+Instead, do this:
+
+```ts
+const func = async (files: string[]) => {
+  await withPermissions(
+    files.map((file) => lock.acquire(file)),
+    async () => {
+      // ...
+    }
+  );
+};
+
+func(["fileA", "fileB"]);
+func(["fileB", "fileA"]);
+```
+
+With this setup, `func` acquires both files at once. If any locks are already held, it will still queue itself to go before any subsequent calls to `acquire`.
