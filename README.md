@@ -1,5 +1,7 @@
 # Composable-Locks
 
+![ci](https://github.com/eblocha/composable-locks/actions/workflows/ci.yaml/badge.svg?branch=master)
+
 Composable concurrency locks for Javascript.
 
 This library provides a number of different lock types:
