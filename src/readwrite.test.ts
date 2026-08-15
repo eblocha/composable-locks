@@ -26,10 +26,7 @@ const withWrite = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
 const newMutex = () => new RWMutex(() => new Mutex());
 
 describe("Base RW Lock", () => {
-  const arbitraryLockType = fc.oneof(
-    fc.constant("read"),
-    fc.constant("write"),
-  );
+  const arbitraryLockType = fc.oneof(fc.constant("read"), fc.constant("write"));
 
   it("Maintains order", async () => {
     await fc.assert(

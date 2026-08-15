@@ -7,8 +7,17 @@
     "reportUnusedDisableDirectives": "deny"
   },
   "categories": {
-    "correctness": "deny"
+    "correctness": "deny",
+    "perf": "warn"
   },
+  "overrides": [
+    {
+      "files": ["*.test.ts"],
+      "rules": {
+        "no-await-in-loop": "off"
+      }
+    }
+  ],
   // See https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/src/configs/eslintrc/recommended-type-checked.ts
   "rules": {
     "typescript/await-thenable": "error",
