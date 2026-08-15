@@ -27,8 +27,8 @@ const newMutex = () => new RWMutex(() => new Mutex());
 
 describe("Base RW Lock", () => {
   const arbitraryLockType = fc.oneof(
-    fc.constant("read" as RWLockType),
-    fc.constant("write" as RWLockType),
+    fc.constant("read"),
+    fc.constant("write"),
   );
 
   it("Maintains order", async () => {

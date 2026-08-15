@@ -1,7 +1,7 @@
-import * as pkg from "./dist/index.js";
+import * as pkg from "./src/index.ts";
 
 const names = Object.keys(pkg);
-const path = "dist/index.js";
+const path = "src/index.ts";
 
 export default [
   {

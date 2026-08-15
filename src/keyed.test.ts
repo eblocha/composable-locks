@@ -51,7 +51,7 @@ describe("Keyed lock", () => {
   it("uses the resolve function to resolve keys", async () => {
     const lock = new KeyedMutex(
       () => new Mutex(),
-      () => "a" as string, // we always resolve to "a", but give different keys. Should be exclusive.
+      (): string => "a", // we always resolve to "a", but give different keys. Should be exclusive.
     );
     const data: number[] = [];
     const delayTicks: number[] = [5, 2];
