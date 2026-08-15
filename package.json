@@ -33,7 +33,6 @@
     "clean": "rm -rf dist",
     "build": "rolldown -c rolldown.config.ts",
     "test": "vitest",
-    "coverage": "vitest run --coverage",
     "lint": "oxlint",
     "prepublishOnly": "pnpm test && pnpm lint && pnpm build",
     "size": "size-limit",
