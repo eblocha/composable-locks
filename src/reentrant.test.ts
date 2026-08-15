@@ -25,14 +25,7 @@ describe("Reentrant Mutex", () => {
 
     await Promise.all(delayTicks.map(fn));
 
-    expect(data).toStrictEqual([
-      "try 20",
-      "try 2",
-      "start 20",
-      "finish 20",
-      "start 2",
-      "finish 2",
-    ]);
+    expect(data).toStrictEqual(["try 20", "try 2", "start 20", "finish 20", "start 2", "finish 2"]);
   });
 
   it("allows re-entrancy", async () => {
@@ -57,14 +50,7 @@ describe("Reentrant Mutex", () => {
 
     await Promise.all(delayTicks.map((ticks) => fn(id, ticks)));
 
-    expect(data).toStrictEqual([
-      "try 20",
-      "try 2",
-      "start 20",
-      "start 2",
-      "finish 2",
-      "finish 20",
-    ]);
+    expect(data).toStrictEqual(["try 20", "try 2", "start 20", "start 2", "finish 2", "finish 20"]);
   });
 
   it("allows a domain to skip the line if greedy", async () => {

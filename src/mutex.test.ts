@@ -6,13 +6,15 @@ import { asyncNOP } from "./test-utils";
 describe("Mutex", () => {
   it(
     "can aquire and release the mutex",
+    // failure when it deadlocks
+    {
+      timeout: 100,
+    },
     async () => {
       const lock = new Mutex();
       const releaser = await lock.acquire();
       releaser();
     },
-    // failure when it deadlocks
-    { timeout: 100 }
   );
 
   it("locks a resource", async () => {

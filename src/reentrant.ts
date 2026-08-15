@@ -20,14 +20,15 @@ type Queued = {
  * release2()
  * ```
  */
-export class ReentrantMutex<A extends unknown[]>
-  implements ILock<[symbol, ...A]>
-{
+export class ReentrantMutex<A extends unknown[]> implements ILock<[symbol, ...A]> {
   protected latest: Queued | null = null;
   protected lockMap: Record<symbol, Queued> = {};
   protected lock: ILock<A>;
 
-  constructor(newLock: () => ILock<A>, private readonly greedy = true) {
+  constructor(
+    newLock: () => ILock<A>,
+    private readonly greedy = true,
+  ) {
     this.lock = newLock();
   }
 

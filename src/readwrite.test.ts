@@ -27,7 +27,7 @@ const newMutex = () => new RWMutex(() => new Mutex());
 describe("Base RW Lock", () => {
   const arbitraryLockType = fc.oneof(
     fc.constant("read" as RWLockType),
-    fc.constant("write" as RWLockType)
+    fc.constant("write" as RWLockType),
   );
 
   it("Maintains order", async () => {
@@ -47,15 +47,13 @@ describe("Base RW Lock", () => {
           };
           await Promise.all(
             locks.map((type, index) =>
-              type === "read"
-                ? withRead(lock, () => fn(index))
-                : withWrite(lock, () => fn(index))
-            )
+              type === "read" ? withRead(lock, () => fn(index)) : withWrite(lock, () => fn(index)),
+            ),
           );
           expect(data).toStrictEqual(expected);
-        }
+        },
       ),
-      { timeout: 500 }
+      { timeout: 500 },
     );
   });
 
@@ -70,9 +68,7 @@ describe("Base RW Lock", () => {
           const lock = newMutex();
 
           const data: string[] = [];
-          const expected = pairs.map(
-            ([type], index) => type + index.toString()
-          );
+          const expected = pairs.map(([type], index) => type + index.toString());
 
           const ticks = pairs.map(([, ticks]) => ticks);
           const types = pairs.map(([type]) => type);
@@ -88,15 +84,13 @@ describe("Base RW Lock", () => {
 
           await Promise.all(
             types.map((type, index) =>
-              type === "read"
-                ? withRead(lock, () => fn(index))
-                : withWrite(lock, () => fn(index))
-            )
+              type === "read" ? withRead(lock, () => fn(index)) : withWrite(lock, () => fn(index)),
+            ),
           );
           expect(data).toStrictEqual(expected);
-        }
+        },
       ),
-      { timeout: 500 }
+      { timeout: 500 },
     );
   });
 
@@ -122,8 +116,7 @@ describe("Base RW Lock", () => {
           const reads = lockData.filter((data) => data.type === "read");
           const writes = lockData.filter((data) => data.type === "write");
 
-          const toString = (type: RWLockType, index: number) =>
-            `${type}${index}`;
+          const toString = (type: RWLockType, index: number) => `${type}${index}`;
 
           // reads all come before writers, in order
           const expected = [
@@ -139,12 +132,12 @@ describe("Base RW Lock", () => {
             locks.map((type, index) =>
               type === "read"
                 ? withRead(lock, () => fn(type, index))
-                : withWrite(lock, () => fn(type, index))
-            )
+                : withWrite(lock, () => fn(type, index)),
+            ),
           );
           expect(data).toStrictEqual(expected);
-        }
-      )
+        },
+      ),
     );
   });
 

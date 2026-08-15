@@ -177,7 +177,7 @@ import * as path from "path";
 
 const lock = new KeyedMutex(
   () => new Mutex(),
-  (key: string) => path.resolve(key)
+  (key: string) => path.resolve(key),
 );
 
 // this will now deadlock
@@ -194,9 +194,7 @@ You can compose these different mutex types together to combine functionality. W
 ```ts
 import { KeyedMutex, ReentrantMutex, RWMutex, Mutex } from "composable-locks";
 
-const lock = new ReentrantMutex(
-  () => new KeyedMutex(() => new RWMutex(() => new Mutex()))
-);
+const lock = new ReentrantMutex(() => new KeyedMutex(() => new RWMutex(() => new Mutex())));
 
 const domain = Symbol();
 
@@ -214,13 +212,10 @@ import { withPermissions, Mutex, KeyedMutex } from "composable-locks";
 
 const lock = new KeyedMutex(() => new Mutex());
 
-const result = await withPermissions(
-  [lock.acquire("fileA"), lock.acquire("fileB")],
-  async () => {
-    // do stuff with file A and B...
-    return result;
-  }
-);
+const result = await withPermissions([lock.acquire("fileA"), lock.acquire("fileB")], async () => {
+  // do stuff with file A and B...
+  return result;
+});
 ```
 
 Be careful with this utility function. If you are dynamically acquiring locks based on a set of keys, make sure to dedupe the keys, or it _will_ deadlock.
@@ -253,7 +248,7 @@ const func = async (files: string[]) => {
     files.map((file) => lock.acquire(file)),
     async () => {
       // ...
-    }
+    },
   );
 };
 

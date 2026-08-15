@@ -12,9 +12,8 @@ type LockRecord<T> = {
  */
 export class KeyedMutex<
   TArgs extends unknown[],
-  TKey extends string | number | symbol
-> implements ILock<[TKey, ...TArgs]>
-{
+  TKey extends string | number | symbol,
+> implements ILock<[TKey, ...TArgs]> {
   protected locks: Record<TKey, LockRecord<ILock<TArgs>>> = {} as Record<
     TKey,
     LockRecord<ILock<TArgs>>
@@ -29,7 +28,7 @@ export class KeyedMutex<
    */
   constructor(
     protected newLock: () => ILock<TArgs>,
-    resolver?: Resolver<TKey>
+    resolver?: Resolver<TKey>,
   ) {
     this.resolver = resolver ?? ((key) => key);
   }

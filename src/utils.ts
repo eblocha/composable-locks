@@ -8,7 +8,7 @@ import type { Releaser } from "./interfaces";
  */
 export const withPermissions = async <T>(
   permssions: Promise<Releaser>[],
-  f: () => T | Promise<T>
+  f: () => T | Promise<T>,
 ): Promise<T> => {
   const releasers = await Promise.all(permssions);
   try {

@@ -1,9 +1,9 @@
-const pkg = require("./dist/index.js");
+import * as pkg from "./dist/index.js";
 
 const names = Object.keys(pkg);
-const path = "dist/index.mjs";
+const path = "dist/index.js";
 
-module.exports = [
+export default [
   {
     path,
     name: "Entire Bundle",
