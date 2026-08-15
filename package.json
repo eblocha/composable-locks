@@ -44,7 +44,6 @@
     "@size-limit/preset-small-lib": "^13.0.3",
     "@vitest/coverage-v8": "^4.1.10",
     "fast-check": "^4.9.0",
-    "microbundle": "^0.15.1",
     "oxfmt": "^0.63.0",
     "oxlint": "^1.78.0",
     "oxlint-tsgolint": "^7.0.2001",
@@ -52,7 +51,6 @@
     "rolldown-plugin-dts": "^0.28.2",
     "size-limit": "^13.0.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.67.0",
     "vite": "^8.2.1",
     "vitest": "^4.1.10"
   },
