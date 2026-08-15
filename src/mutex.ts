@@ -2,7 +2,7 @@ import type { ILock, Releaser } from "./interfaces.ts";
 
 // inspired from https://github.com/mgtitimoli/await-mutex, with some tweaks for typescript
 export class Mutex implements ILock<[]> {
-  protected locking = Promise.resolve();
+  protected locking: Promise<void> = Promise.resolve();
 
   public acquire(): Promise<Releaser> {
     let unlockNext: Releaser;

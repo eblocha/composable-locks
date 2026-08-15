@@ -4,7 +4,7 @@ import { ReentrantMutex } from "./reentrant.ts";
 export type RWLockType = "read" | "write";
 
 export class RWMutex<A extends unknown[]> implements ILock<[RWLockType, ...A]> {
-  protected readerDomain = Symbol();
+  protected readerDomain: symbol = Symbol();
   protected base: ReentrantMutex<A>;
 
   public constructor(newLock: () => ILock<A>, preferRead = false) {

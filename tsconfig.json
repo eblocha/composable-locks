@@ -8,6 +8,7 @@
     "rootDir": ".",
     "moduleResolution": "nodenext",
     "isolatedModules": true,
+    "isolatedDeclarations": true,
 
     /* Emit */
     "declaration": true,
@@ -20,5 +21,6 @@
     "strict": true,
     "useUnknownInCatchVariables": true,
     "noUncheckedIndexedAccess": true
-  }
+  },
+  "exclude": ["*.config.ts"]
 }
