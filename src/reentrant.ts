@@ -26,7 +26,7 @@ export class ReentrantMutex<A extends unknown[]> implements ILock<[symbol, ...A]
   protected lock: ILock<A>;
   private readonly greedy: boolean;
 
-  constructor(newLock: () => ILock<A>, greedy = true) {
+  public constructor(newLock: () => ILock<A>, greedy = true) {
     this.greedy = greedy;
     this.lock = newLock();
   }
@@ -36,7 +36,7 @@ export class ReentrantMutex<A extends unknown[]> implements ILock<[symbol, ...A]
    * @param id The domain identifier.
    * @returns A function to release the lock. A domain *must* call all releasers before exiting.
    */
-  public async acquire(id: symbol, ...args: A) {
+  public async acquire(id: symbol, ...args: A): Promise<Releaser> {
     const queued = this.getQueued(id, ...args);
 
     const releaser = await queued.releaser;
@@ -94,7 +94,7 @@ export class ReentrantMutex<A extends unknown[]> implements ILock<[symbol, ...A]
     };
   }
 
-  private cleanup(queued: Queued) {
+  private cleanup(queued: Queued): void {
     if (this.greedy) {
       delete this.lockMap[queued.id];
     } else if (this.latest === queued) {
@@ -102,7 +102,7 @@ export class ReentrantMutex<A extends unknown[]> implements ILock<[symbol, ...A]
     }
   }
 
-  private release(queued: Queued, releaser: Releaser) {
+  private release(queued: Queued, releaser: Releaser): void {
     queued.reentrants--;
     if (queued.reentrants === 0) {
       this.cleanup(queued);

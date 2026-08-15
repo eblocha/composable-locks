@@ -8,18 +8,26 @@
   },
   "categories": {
     "correctness": "deny",
-    "perf": "warn"
+    "perf": "warn",
+    "suspicious": "warn",
+    "restriction": "warn"
   },
   "overrides": [
     {
       "files": ["*.test.ts"],
       "rules": {
-        "no-await-in-loop": "off"
+        "no-await-in-loop": "off",
+        "typescript/explicit-function-return-type": "off",
+        "typescript/no-non-null-assertion": "off"
       }
     }
   ],
-  // See https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/src/configs/eslintrc/recommended-type-checked.ts
   "rules": {
+    "no-plusplus": "off",
+    "typescript/promise-function-async": "off",
+    "typescript/no-dynamic-delete": "off",
+    "default-case": "off",
+    // See https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/src/configs/eslintrc/recommended-type-checked.ts
     "typescript/await-thenable": "error",
     "typescript/ban-ts-comment": "error",
     "no-array-constructor": "off",

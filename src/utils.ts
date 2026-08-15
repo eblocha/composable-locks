@@ -7,7 +7,7 @@ import type { Releaser } from "./interfaces.ts";
  * @returns The return value of f
  */
 export const withPermissions = async <T>(
-  permssions: Promise<Releaser>[],
+  permssions: readonly Promise<Releaser>[],
   f: () => T | Promise<T>,
 ): Promise<T> => {
   const releasers = await Promise.all(permssions);

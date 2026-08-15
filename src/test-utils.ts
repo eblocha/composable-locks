@@ -1,1 +1,1 @@
-export const asyncNOP = () => new Promise<void>((resolve) => resolve());
+export const asyncNOP = (): Promise<void> => Promise.resolve();

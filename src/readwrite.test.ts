@@ -68,7 +68,7 @@ describe("Base RW Lock", () => {
           const data: string[] = [];
           const expected = pairs.map(([type], index) => type + index.toString());
 
-          const ticks = pairs.map(([, ticks]) => ticks);
+          const ticks = pairs.map(([, t]) => t);
           const types = pairs.map(([type]) => type);
 
           const fn = async (index: number) => {
@@ -111,15 +111,15 @@ describe("Base RW Lock", () => {
             type,
             index,
           }));
-          const reads = lockData.filter((data) => data.type === "read");
-          const writes = lockData.filter((data) => data.type === "write");
+          const reads = lockData.filter((d) => d.type === "read");
+          const writes = lockData.filter((d) => d.type === "write");
 
           const toString = (type: RWLockType, index: number) => `${type}${index}`;
 
           // reads all come before writers, in order
           const expected = [
-            ...reads.map((data) => toString(data.type, data.index)),
-            ...writes.map((data) => toString(data.type, data.index)),
+            ...reads.map((d) => toString(d.type, d.index)),
+            ...writes.map((d) => toString(d.type, d.index)),
           ];
 
           const fn = (type: RWLockType, index: number) => {

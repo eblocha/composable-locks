@@ -14,10 +14,7 @@ export class KeyedMutex<
   TArgs extends unknown[],
   TKey extends string | number | symbol,
 > implements ILock<[TKey, ...TArgs]> {
-  protected locks: Record<TKey, LockRecord<ILock<TArgs>>> = {} as Record<
-    TKey,
-    LockRecord<ILock<TArgs>>
-  >;
+  protected locks: Partial<Record<TKey, LockRecord<ILock<TArgs>>>> = {};
   protected resolver: Resolver<TKey>;
   protected newLock: () => ILock<TArgs>;
 
@@ -27,9 +24,9 @@ export class KeyedMutex<
    * @param resolver A function to transform a key into a normalized form.
    * Useful for resolving paths.
    */
-  constructor(newLock: () => ILock<TArgs>, resolver?: Resolver<TKey>) {
+  public constructor(newLock: () => ILock<TArgs>, resolver?: Resolver<TKey>) {
     this.newLock = newLock;
-    this.resolver = resolver ?? ((key) => key);
+    this.resolver = resolver ?? ((key): TKey => key);
   }
 
   private getOrCreateLock(key: TKey): LockRecord<ILock<TArgs>> {
