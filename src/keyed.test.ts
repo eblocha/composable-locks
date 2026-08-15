@@ -1,8 +1,9 @@
-import { Mutex } from "./mutex";
 import { describe, it, expect } from "vitest";
-import { KeyedMutex } from "./keyed";
-import { withPermissions } from "./utils";
-import { asyncNOP } from "./test-utils";
+
+import { KeyedMutex } from "./keyed.ts";
+import { Mutex } from "./mutex.ts";
+import { asyncNOP } from "./test-utils.ts";
+import { withPermissions } from "./utils.ts";
 
 describe("Keyed lock", () => {
   it("allows different keys to lock independently", async () => {
@@ -22,7 +23,7 @@ describe("Keyed lock", () => {
 
     const expected = [2, 5];
 
-    await Promise.all(delayTicks.map((ticks, index) => fn(ticks, keys[index])));
+    await Promise.all(delayTicks.map((ticks, index) => fn(ticks, keys[index]!)));
     expect(data).toStrictEqual(expected);
   });
 
@@ -43,7 +44,7 @@ describe("Keyed lock", () => {
 
     const expected = [5, 2];
 
-    await Promise.all(delayTicks.map((ticks, index) => fn(ticks, keys[index])));
+    await Promise.all(delayTicks.map((ticks, index) => fn(ticks, keys[index]!)));
     expect(data).toStrictEqual(expected);
   });
 
@@ -67,7 +68,7 @@ describe("Keyed lock", () => {
 
     const expected = [5, 2];
 
-    await Promise.all(delayTicks.map((ticks, index) => fn(ticks, keys[index])));
+    await Promise.all(delayTicks.map((ticks, index) => fn(ticks, keys[index]!)));
     expect(data).toStrictEqual(expected);
   });
 

@@ -1,8 +1,9 @@
-import { Mutex } from "./mutex";
-import { describe, it, expect } from "vitest";
-import { RWMutex, RWLockType } from "./readwrite";
 import * as fc from "fast-check";
-import { asyncNOP } from "./test-utils";
+import { describe, it, expect } from "vitest";
+
+import { Mutex } from "./mutex.ts";
+import { RWMutex, RWLockType } from "./readwrite.ts";
+import { asyncNOP } from "./test-utils.ts";
 
 const withRead = async (lock: RWMutex<[]>, cb: () => Promise<void>) => {
   const release = await lock.acquire("read");

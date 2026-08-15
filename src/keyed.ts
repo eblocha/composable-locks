@@ -1,4 +1,4 @@
-import type { ILock, Releaser } from "./interfaces";
+import type { ILock, Releaser } from "./interfaces.ts";
 
 export type Resolver<K> = (key: K) => K;
 
@@ -19,6 +19,7 @@ export class KeyedMutex<
     LockRecord<ILock<TArgs>>
   >;
   protected resolver: Resolver<TKey>;
+  protected newLock: () => ILock<TArgs>;
 
   /**
    * A keyed lock, for mapping strings to a lock type
@@ -26,10 +27,8 @@ export class KeyedMutex<
    * @param resolver A function to transform a key into a normalized form.
    * Useful for resolving paths.
    */
-  constructor(
-    protected newLock: () => ILock<TArgs>,
-    resolver?: Resolver<TKey>,
-  ) {
+  constructor(newLock: () => ILock<TArgs>, resolver?: Resolver<TKey>) {
+    this.newLock = newLock;
     this.resolver = resolver ?? ((key) => key);
   }
 

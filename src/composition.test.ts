@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { Mutex } from "./mutex";
-import { KeyedMutex } from "./keyed";
-import { RWLockType, RWMutex } from "./readwrite";
-import { ReentrantMutex } from "./reentrant";
-import { withPermissions } from "./utils";
-import { asyncNOP } from "./test-utils";
+
+import { KeyedMutex } from "./keyed.ts";
+import { Mutex } from "./mutex.ts";
+import { RWLockType, RWMutex } from "./readwrite.ts";
+import { ReentrantMutex } from "./reentrant.ts";
+import { asyncNOP } from "./test-utils.ts";
+import { withPermissions } from "./utils.ts";
 
 describe("Lock composition", () => {
   it("allows concurrent writers in the same re-entrant domain", async () => {

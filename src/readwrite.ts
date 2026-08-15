@@ -1,5 +1,5 @@
-import type { ILock, Releaser } from "./interfaces";
-import { ReentrantMutex } from "./reentrant";
+import type { ILock, Releaser } from "./interfaces.ts";
+import { ReentrantMutex } from "./reentrant.ts";
 
 export type RWLockType = "read" | "write";
 

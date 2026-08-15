@@ -1,4 +1,4 @@
-import type { ILock, Releaser } from "./interfaces";
+import type { ILock, Releaser } from "./interfaces.ts";
 
 // inspired from https://github.com/mgtitimoli/await-mutex, with some tweaks for typescript
 export class Mutex implements ILock<[]> {

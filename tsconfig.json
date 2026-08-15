@@ -1,22 +1,24 @@
 {
   "compilerOptions": {
     /* Language and Environment */
-    "target": "ESNext",
+    "target": "esnext",
 
     /* Modules */
-    "module": "ESNext",
-    "rootDir": "./src",
+    "module": "nodenext",
+    "rootDir": ".",
+    "moduleResolution": "nodenext",
+    "isolatedModules": true,
 
     /* Emit */
     "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
 
     /* Type Checking */
     "strict": true,
     "useUnknownInCatchVariables": true,
     "noUncheckedIndexedAccess": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["**/*.test.ts", "**/*.spec.ts", "src/test-utils.ts"]
+  }
 }

@@ -1,7 +1,8 @@
-import { Mutex } from "./mutex";
 import { describe, expect, it } from "vitest";
-import { withPermissions } from "./utils";
-import { asyncNOP } from "./test-utils";
+
+import { Mutex } from "./mutex.ts";
+import { asyncNOP } from "./test-utils.ts";
+import { withPermissions } from "./utils.ts";
 
 describe("Mutex", () => {
   it(

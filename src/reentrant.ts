@@ -1,4 +1,4 @@
-import type { ILock, Releaser } from "./interfaces";
+import type { ILock, Releaser } from "./interfaces.ts";
 
 type Queued = {
   id: symbol;
@@ -24,11 +24,10 @@ export class ReentrantMutex<A extends unknown[]> implements ILock<[symbol, ...A]
   protected latest: Queued | null = null;
   protected lockMap: Record<symbol, Queued> = {};
   protected lock: ILock<A>;
+  private readonly greedy: boolean;
 
-  constructor(
-    newLock: () => ILock<A>,
-    private readonly greedy = true,
-  ) {
+  constructor(newLock: () => ILock<A>, greedy = true) {
+    this.greedy = greedy;
     this.lock = newLock();
   }
 

@@ -1,4 +1,4 @@
-import type { Releaser } from "./interfaces";
+import type { Releaser } from "./interfaces.ts";
 
 /**
  * Execute an async function with permissions
